@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC  "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"  "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">  
+ 
+<tiles-definitions>  
+  
+   <!-- Base Definition -->
+   <definition name="base-definition"
+       template="/WEB-INF/views/tiles/layouts/defaultLayout.jsp">  
+       <put-attribute name="title" value="Pomangam CMS" />  
+       <put-attribute name="header" value="/WEB-INF/views/tiles/template/defaultHeader.jsp" />  
+       <put-attribute name="menu" value="/WEB-INF/views/tiles/template/defaultMenu.jsp" />  
+       <put-attribute name="body" value="" />  
+       <put-attribute name="footer" value="/WEB-INF/views/tiles/template/defaultFooter.jsp" />  
+   </definition>  
+  
+   <definition name="Settop" extends="base-definition">  
+       <put-attribute name="title" value="셋탑관리" />  
+       <put-attribute name="body" value="/WEB-INF/views/settop.jsp" />  
+   </definition>  
+ 
+   <definition name="Vod" extends="base-definition">  
+       <put-attribute name="title" value="VOD 관리" />  
+       <put-attribute name="body" value="/WEB-INF/views/vod.jsp" />  
+   </definition>  
+       
+   <definition name="Live" extends="base-definition">  
+       <put-attribute name="title" value="LIVE 관리" />  
+       <put-attribute name="body" value="/WEB-INF/views/live.jsp" />  
+   </definition>
+   
+   <definition name="Advertise" extends="base-definition">  
+       <put-attribute name="title" value="광고 관리" />  
+       <put-attribute name="body" value="/WEB-INF/views/advertise.jsp" />  
+   </definition>
+   
+   <definition name="Category" extends="base-definition">  
+       <put-attribute name="title" value="카테고리 관리" />  
+       <put-attribute name="body" value="/WEB-INF/views/category.jsp" />  
+   </definition>
+   
+   <definition name="Gift" extends="base-definition">  
+       <put-attribute name="title" value="상품권 리스트" />  
+       <put-attribute name="body" value="/WEB-INF/views/gift.jsp" />  
+   </definition>
+   
+   <definition name="GiftLog" extends="base-definition">  
+       <put-attribute name="title" value="상품권 사용로그" />  
+       <put-attribute name="body" value="/WEB-INF/views/giftlog.jsp" />  
+   </definition>
+   
+   <definition name="Admin" extends="base-definition">  
+       <put-attribute name="title" value="운영자 리스트" />  
+       <put-attribute name="body" value="/WEB-INF/views/admin.jsp" />  
+   </definition>
+   
+   <definition name="Authority" extends="base-definition">  
+       <put-attribute name="title" value="권한 설정" />  
+       <put-attribute name="body" value="/WEB-INF/views/authority.jsp" />  
+   </definition>
+   
+   <definition name="ServerGroup" extends="base-definition">  
+       <put-attribute name="title" value="서버 그룹 정보" />  
+       <put-attribute name="body" value="/WEB-INF/views/servergroup.jsp" />  
+   </definition>
+   
+   <definition name="ServerInfo" extends="base-definition">  
+       <put-attribute name="title" value="서버 정보" />  
+       <put-attribute name="body" value="/WEB-INF/views/serverinfo.jsp" />  
+   </definition>
+   
+   <definition name="SettopGroup" extends="base-definition">  
+       <put-attribute name="title" value="셋탑 그룹 정보" />  
+       <put-attribute name="body" value="/WEB-INF/views/settopgroup.jsp" />  
+   </definition>
+   
+   <definition name="Mapping" extends="base-definition">  
+       <put-attribute name="title" value="서버-셋탑 그룹 매핑" />  
+       <put-attribute name="body" value="/WEB-INF/views/mapping.jsp" />  
+   </definition>
+   
+   <definition name="App" extends="base-definition">  
+       <put-attribute name="title" value="앱 관리" />  
+       <put-attribute name="body" value="/WEB-INF/views/app.jsp" />  
+   </definition>
+   
+   <definition name="Notice" extends="base-definition">  
+       <put-attribute name="title" value="공지사항 관리" />  
+       <put-attribute name="body" value="/WEB-INF/views/notice.jsp" />  
+   </definition>
+   
+   <definition name="Test" extends="base-definition">  
+       <put-attribute name="title" value="테스트" />  
+       <put-attribute name="body" value="/WEB-INF/views/test.jsp" />  
+   </definition>
+  
+</tiles-definitions>

@@ -1,0 +1,81 @@
+.custom-file-container {
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.custom-file-container__custom-file {
+  box-sizing: border-box;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  height: calc(2.25rem + 2px);
+  margin-bottom: 15px;
+  margin-top: 5px;
+}
+.custom-file-container__custom-file:hover {
+  cursor: pointer;
+}
+.custom-file-container__custom-file__custom-file-input {
+  box-sizing: border-box;
+  min-width: 14rem;
+  max-width: 100%;
+  margin: 0;
+  opacity: 0;
+}
+.custom-file-container__custom-file__custom-file-control {
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 5;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 2px;
+  overflow: hidden;
+  color: #333;
+  user-select: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #c0c0af;
+  border-radius: 0.25rem;
+}
+.custom-file-container__custom-file__custom-file-control:empty::after {
+  box-sizing: border-box;
+  content: "파일을 선택하세요.";
+}
+.custom-file-container__custom-file__custom-file-control::before {
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 6;
+  display: block;
+  padding: 0.5rem 0.75rem;
+  color: #333;
+  background-color: #edede8;
+  border-left: 1px solid #c0c0af;
+}
+.custom-file-container__custom-file__custom-file-control::before {
+  box-sizing: border-box;
+  content: "찾기";
+}
+
+.custom-file-container__image-preview {
+  box-sizing: border-box;
+  transition: all 0.6s ease;
+  margin-top: 8px;
+  margin-bottom: 20px;
+  height: 250px;
+  width: 100%;
+  border-radius: 4px;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.upload-btn .delete-btn {
+	padding: 2px;
+	
+}

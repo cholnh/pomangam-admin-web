@@ -1,9 +1,9 @@
+<%@page import="com.mrporter.pomangam.common.security.model.domain.Role"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="com.dduck.argentina.common.security.model.domain.User"%>
+<%@ page import="com.mrporter.pomangam.common.security.model.domain.User"%>
 <%@ page import="com.google.gson.Gson"%>
 <%@ page import="com.google.gson.reflect.TypeToken"%>
 <%@ page import="java.util.List"%>
-<%@ page import="com.dduck.argentina.common.security.model.domain.Role"%>
 
 <%!	
 	List<Role> authlist;

@@ -59,7 +59,7 @@
 					<th data-field="receive_date" data-sortable="true">받는날짜</th>
 					<th data-field="receive_time" data-sortable="true">받는시간</th>
 					<th data-field="where" data-sortable="true">음식받는곳</th>
-					<th data-field="username" data-sortable="true">아이디</th>
+					<th data-field="member_name" data-sortable="true">이름</th>
 					<th data-field="phonenumber" data-sortable="true">핸드폰번호</th>
 					<th data-field="guestname" data-sortable="true">비회원이름</th>
 					<th data-field="totalprice" data-sortable="true">총가격</th>

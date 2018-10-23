@@ -1,10 +1,20 @@
+<%@page import="com.mrporter.pomangam.restaurant.vo.RestaurantBean"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@page import="java.util.List"%>
 <%@page import="com.google.gson.Gson"%>
 <%@page import="com.google.gson.reflect.TypeToken"%>
 <%@page import="com.mrporter.pomangam.member.vo.AdminBean"%>
+<%
+	String paramtime = request.getParameter("time");
+	String paramres = request.getParameter("res");
 
+	@SuppressWarnings({"unchecked"})
+	List<Integer> orderedRestaurantList = (List<Integer>) request.getAttribute("orderedRestaurantList");
+	@SuppressWarnings({"unchecked"})
+	List<RestaurantBean> restaurantBeanList = (List<RestaurantBean>) request.getAttribute("restaurantBeanList");
+	
+%>
 <div class="px-content" style="padding:5px">
 	<div class="page-header">
 		<h1>
@@ -15,9 +25,31 @@
 	<div class="container" style="-webkit-overflow-scrolling:touch;">
 
 		<div class="table-title" style="background-color: #f5f5f5">
+			<div style="color:black; text-align:right; margin-botton:12px">
+				<%if(orderedRestaurantList!=null && orderedRestaurantList.size()>0){ %>
+				<select id="query_restaurant">
+					<option value="-1">전체</option>
+					<%for(Integer res : orderedRestaurantList) {%>
+					<option value="<%=res %>" <%if(paramres!=null){if(res.intValue() == Integer.parseInt(paramres)){out.print("selected");}} %>>
+					<%
+						for(RestaurantBean bean : restaurantBeanList) {
+							if(bean.getIdx().intValue() == res) {
+								out.print(bean.getName());
+								break;
+							}
+						}
+					%>
+					</option>
+					<%} %>
+				</select>
+				<%} %>
+				<select id="query_time">
+					<option value="-1">전체</option>
+				</select>
+			</div>
+			<br>
 			<div class="row">
-				<div class="col-sm-6" style="color:black;font-size:18px">
-					 <span id="totalnum"></span>
+				<div class="col-sm-6">
 				</div>
 				<div class="col-sm-6">
 					<a class="btn btn-info" id="export"><i
@@ -31,7 +63,10 @@
 			data-minimum-count-columns="2"
 			data-mobile-responsive="true" style="background-color: white"
 			data-search="true" data-pagination="true" style="-webkit-overflow-scrolling:touch;"
-			data-url="./porter/gettotaylist.do">
+			data-url="./porter/gettotaylist.do
+				<%
+				if(paramtime!=null){out.print("?time="+paramtime);}
+				if(paramres!=null){out.print("&res="+paramres);}%>">
 			<colgroup>
 				<col style="width:auto">
 				<col style="width:auto">
@@ -127,8 +162,42 @@
 var targetList = ${targetList};
 var restaurantList = ${restaurantList};
 var productList = ${productList};
+
 //var additionalList = ${additionalList};
 $('#test').hide();
+
+var paramtime = <%=paramtime%>;
+var time_list = [12,13,14,17,18,19,21,22];
+time_list.forEach(function(e){
+	var tf = false;
+	if(paramtime != null && (paramtime == e)) {
+		tf = true;
+	}
+	$('#query_time').append($('<option>', {
+	    text: e+'시',
+	    value: e,
+	    selected: tf
+	}));
+});
+
+$('#query_time').change(function() {
+	 var t = $(this).val();
+	 var url = './porter.do';
+	 if(t != -1) {
+		 url += '?time='+t;
+	 }
+	 location.href = url;
+});
+
+$('#query_restaurant').change(function() {
+	var t = paramtime;
+	var r = $(this).val();
+	var url = './porter.do?time='+t;
+	if(r != -1) {
+		 url += '&res='+r;
+	 }
+	location.href = url;
+});
 
 var targetMap;
 targetMap = targetList.reduce(function(map, obj) {

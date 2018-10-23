@@ -26,7 +26,8 @@ public class PorterController {
 	private static final String MAPPINGNAME = "porter";
 	
 	@RequestMapping(value = "/"+MAPPINGNAME+".do")
-	public ModelAndView openIndexPage() throws Exception {
+	public ModelAndView openIndexPage(
+			@RequestParam(value = "time", required = false) String time) throws Exception {
 
 		//PaymentIndexCrudDAO indexDAO = new PaymentIndexCrudDAO();
 		
@@ -34,8 +35,13 @@ public class PorterController {
 		model.setViewName("contents/" + MAPPINGNAME);
 		model.addObject("targetList", new TargetCrudDAO().getCompactList());
 		model.addObject("restaurantList", new RestaurantCrudDAO().getCompactList());
+		model.addObject("restaurantBeanList", new RestaurantCrudDAO().getBeanList());
 		model.addObject("productList", new ProductCrudDAO().getCompactList());
 		//model.addObject("additionalList", new ProductCrudDAO().getAdditionalCompactList());
+		
+		if(time != null && time.length() > 0) {
+			model.addObject("orderedRestaurantList", new PaymentIndexCrudDAO().getOrderedRestaurant(time));
+		}
 		
 		return model;
 	}
@@ -63,8 +69,17 @@ public class PorterController {
 	
 	@RequestMapping(value = "/"+MAPPINGNAME+"/gettotaylist.do", 
 			produces = "application/json; charset=utf-8")
-	public @ResponseBody String getTodayList() throws Exception {
+	public @ResponseBody String getTodayList(
+			@RequestParam(value = "time", required = false) String time,
+			@RequestParam(value = "res", required = false) String res) throws Exception {
 		
+		if(time != null && res != null) {
+			return new PaymentIndexCrudDAO().getTodayJsonWithTimeAndRes(time, res);
+		}
+		if(time != null) {
+			return new PaymentIndexCrudDAO().getTodayJsonWithTime(time);
+		}
+
 		return new PaymentIndexCrudDAO().getTodayJson();
 	}
 	

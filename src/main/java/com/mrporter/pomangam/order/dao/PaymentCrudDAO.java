@@ -30,4 +30,5 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 		
 		return new Gson().toJson(lom);
 	}
+	
 }

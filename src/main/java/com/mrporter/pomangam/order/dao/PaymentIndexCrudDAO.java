@@ -1,8 +1,10 @@
 package com.mrporter.pomangam.order.dao;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,45 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		super(TABLENAME);
 	}
 	
+	public List<Integer> getOrderedRestaurant(String time) throws Exception {
+		
+		List<Map<String, Object>> lom 
+		= sqlQuery(
+				"SELECT idxes_payment FROM payment_index WHERE receive_date = ? AND receive_time = ?", Date.getCurDay(), time+"시");
+		
+		List<Integer> result = new ArrayList<>();
+		Set<String> set = new HashSet<>();
+		
+		if(lom!=null && !lom.isEmpty()) {
+			
+			for(Map<String, Object> map : lom) {
+				String[] idxes_payment = (map.get("idxes_payment")+"").split(",");
+				for(String idx : idxes_payment) {
+					List<Map<String, Object>> lom2 
+					= sqlQuery(
+							"SELECT idx_restaurant FROM payment WHERE idx = ?", idx);
+					if(lom2!=null && !lom2.isEmpty()) {
+						String idx_restaurant = lom2.get(0).get("idx_restaurant")+"";
+						set.add(idx_restaurant);
+					}
+				}
+			}
+		}
+		
+		for(String idx : set) {
+			result.add(Integer.parseInt(idx));
+		}
+		
+		return result;
+	}
+	
+	public static void main(String...args) {
+		try {
+			System.out.println(new PaymentIndexCrudDAO().getOrderedRestaurant("17"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	public void setStatus(Integer status, Integer idx) throws Exception {
 		sqlUpdate("UPDATE payment_index SET status = ? WHERE idx = ?", status, idx);
 	}
@@ -69,13 +110,7 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		return gson.toJson(res);
 	}
 	
-	public static void main(String...args) {
-		try {
-			System.out.println(new PaymentIndexCrudDAO().getTodaySettlementList("2018-09-17"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+
 	
 	public List<PaymentIndexBean> getTodayList() throws Exception {
 		List<Map<String, Object>> lom 
@@ -96,6 +131,46 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		return list;
 	}
 	
+	public String getTodayJsonWithTimeAndRes(String time, String res) throws Exception {
+		List<Map<String, Object>> result = new ArrayList<>();
+		
+		List<Map<String, Object>> lom 
+		= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND receive_time = ? order by receive_time desc, idx_box desc;",
+				Date.getCurDay(), time+"시");
+
+		if(lom!=null && !lom.isEmpty()) {
+			
+			for(Map<String, Object> map : lom) {
+				String[] idxes_payment = (map.get("idxes_payment")+"").split(",");
+				
+				
+				for(String idx : idxes_payment) {
+					List<Map<String, Object>> lom2 
+					= sqlQuery(
+							"SELECT idx_restaurant FROM payment WHERE idx = ?", idx);
+					if(lom2!=null && !lom2.isEmpty()) {
+						String idx_restaurant = lom2.get(0).get("idx_restaurant")+"";
+						if(idx_restaurant.equals(res)){
+							result.add(map);
+							break;
+						}
+					}
+				}
+				
+			}
+		}
+
+		Gson gson = new Gson();
+		return gson.toJson(result);
+	}
+	public String getTodayJsonWithTime(String time) throws Exception {
+		List<Map<String, Object>> lom 
+		= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND receive_time = ? order by receive_time desc, idx_box desc;",
+				Date.getCurDay(), time+"시");
+		Gson gson = new Gson();
+		return gson.toJson(lom);
+	}
+
 	public String getTodayJson() throws Exception {
 		List<Map<String, Object>> lom 
 		= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? order by receive_time desc, idx_box desc;",

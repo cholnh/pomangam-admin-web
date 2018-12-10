@@ -59,6 +59,19 @@ public class PorterController {
 		
 	}
 	
+	@RequestMapping(value = "/"+MAPPINGNAME+"/setorderdone.do", 
+			produces = "application/json; charset=utf-8")
+	public @ResponseBody void setOrderDone(
+			@RequestParam(value = "idxes", required = false) String idxes) throws Exception {
+		PaymentIndexCrudDAO indexDAO = new PaymentIndexCrudDAO();
+		if(idxes!=null) {
+			for(String idx : idxes.split(",")) {
+				indexDAO.setOrderStatus(1, Integer.parseInt(idx));
+			}
+		}
+		
+	}
+	
 	@RequestMapping(value = "/"+MAPPINGNAME+"/getdetail.do", 
 			produces = "application/json; charset=utf-8")
 	public @ResponseBody String getDetail(

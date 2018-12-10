@@ -71,6 +71,12 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	public void setOrderStatus(Integer status, Integer idx) throws Exception {
+		sqlUpdate("UPDATE payment SET status = ? WHERE idx = ?", status, idx);
+	}
+	
 	public void setStatus(Integer status, Integer idx) throws Exception {
 		sqlUpdate("UPDATE payment_index SET status = ? WHERE idx = ?", status, idx);
 	}
@@ -109,8 +115,6 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		}
 		return gson.toJson(res);
 	}
-	
-
 	
 	public List<PaymentIndexBean> getTodayList() throws Exception {
 		List<Map<String, Object>> lom 

@@ -46,6 +46,11 @@
 				<select id="query_time">
 					<option value="-1">전체</option>
 				</select>
+				<select id="query_loc">
+					<option value="-1">전체</option>
+					<option value="1">학생회관 뒤</option>
+					<option value="2">기숙사 식당</option>
+				</select>
 			</div>
 			<br>
 			<div class="row">
@@ -54,8 +59,10 @@
 				<div class="col-sm-6">
 					<a class="btn btn-info" id="export"><i
 						class="ion-android-download"></i> <span>내보내기</span></a>
+					<a class="btn btn-primary" id="copypn"><span>번호복사</span></a>
 					<a class="btn btn-primary" id="total"><span>전체보기</span></a>
 					<a class="btn btn-primary" id="paydone"><span>입금처리</span></a>
+					
 				</div>
 			</div>
 		</div>
@@ -103,6 +110,7 @@
 				</tr>
 			</thead>
 		</table>
+		<textarea id="copyarea"></textarea>
 	</div>
 </div>
 
@@ -123,6 +131,7 @@
 							</div>
 							<div class="col-sm-6">
 								<a class="btn btn-primary" id="copy" onclick="copy()"><span>복사하기</span></a>
+								<a class="btn btn-primary" id="order" onclick="order()"><span>주문처리</span></a>
 							</div>
 						</div>
 					</div>
@@ -134,6 +143,7 @@
 							<tr>
 								<th data-field="" data-checkbox="true"></th>
 								<th data-field="idx" data-sortable="true">번호</th>
+								<th data-field="status" data-sortable="true" data-formatter="orderFormatter">주문상태</th>
 								<th data-field="idx_restaurant" data-sortable="true" data-formatter="restaurantFormatter">음식점</th>
 								<th data-field="idx_product" data-sortable="true" data-formatter="productFormatter">제품명</th>
 								<th data-field="additional" data-sortable="true" data-formatter="additionalFormatter">추가사항</th>
@@ -165,6 +175,7 @@ var productList = ${productList};
 
 //var additionalList = ${additionalList};
 $('#test').hide();
+$('#copyarea').hide();
 
 var paramtime = <%=paramtime%>;
 var time_list = [12,13,14,17,18,19,21,22];
@@ -181,12 +192,27 @@ time_list.forEach(function(e){
 });
 
 $('#query_time').change(function() {
-	 var t = $(this).val();
-	 var url = './porter.do';
-	 if(t != -1) {
-		 url += '?time='+t;
-	 }
-	 location.href = url;
+	var t = $(this).val();
+	var url = './porter.do';
+	if(t != -1) {
+		url += '?time='+t;
+	}
+	location.href = url;
+});
+
+$('#query_loc').change(function() {
+	var loc = $(this).val();
+	$('#table').bootstrapTable('filterBy');
+	if(loc == 1) {
+		$('#table').bootstrapTable('filterBy', {
+		    where : ['학생회관 뒤']
+		});
+	} else if(loc == 2) {
+		$('#table').bootstrapTable('filterBy', {
+		    where : ['기숙사 식당 (도착시간 +10분)']
+		});
+	}
+	
 });
 
 $('#query_restaurant').change(function() {
@@ -194,8 +220,8 @@ $('#query_restaurant').change(function() {
 	var r = $(this).val();
 	var url = './porter.do?time='+t;
 	if(r != -1) {
-		 url += '&res='+r;
-	 }
+		url += '&res='+r;
+	}
 	location.href = url;
 });
 
@@ -246,6 +272,19 @@ function statusFormatter(value, row) {
 	return result;
 }
 
+function orderFormatter(value, row) {
+	var result;
+	switch(value) {
+	case 0:
+		result = '주문대기';
+		break;
+	case 1:
+		result = '주문완료';
+		break;
+	}
+	return result;
+}
+
 function targetFormatter(value, row) {
 	return targetMap[value];
 }
@@ -270,6 +309,64 @@ function additionalFormatter(value, row) {
 	return result.length>0?result:'-';
 }
 
+function order() {
+	var selections = $('#table2').bootstrapTable('getSelections');
+	if(selections.length <= 0) {
+		alert('상태를 변경할 데이터를 선택하세요.');
+		return;
+	}
+
+	var selectedIdxes = '';
+	for(var index = 0 ; index < selections.length ; index++){
+		selectedIdxes += selections[index].idx + ',';
+	}
+	
+	if(confirm('주문완료 상태로 변경 하시겠습니까?')) {
+		copy();
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		$.ajax({
+			type : "POST",
+			url : './porter/setorderdone.do',
+			data : {
+				idxes: selectedIdxes
+			},
+			beforeSend : function(request) {
+				request.setRequestHeader(header, token);
+			},
+			success : function(data) {
+				//$('#table2').bootstrapTable('refresh');
+				$('#table2').bootstrapTable('removeAll');
+				$('#detailInfo').modal({backdrop: 'static'});
+				$('#detailInfo').modal('show');
+			
+				var token = $("meta[name='_csrf']").attr("content");
+				var header = $("meta[name='_csrf_header']").attr("content");	
+				$.ajax({
+					type : "POST",
+					url : './porter/getdetail.do',
+					data : {
+						idxes_payment : bean.idxes_payment
+					},
+					beforeSend : function(request) {
+						request.setRequestHeader(header, token);
+					},
+					success : function(e) {
+						$('#table2').bootstrapTable('load', e);
+						
+					},
+					error : function(msg) {
+						alert('ajax error' + msg);
+					}
+				});
+			},
+			error : function(msg) {
+				alert('ajax error' + msg);
+			}
+		});
+	}
+}
+
 function copy() {
 	var datas = $('#table2').bootstrapTable('getSelections');
 	if(datas.length <= 0) return;
@@ -288,16 +385,13 @@ function copy() {
 		for(var i=0; i<parts.length; i++) {
 			var p = parts[i].split('-');
 			if(p[3]) {
-				add += '추가' + i + ' : ' + p[3] + ' - '+(p[1]*data.amount)+'개';
-				if(i!=parts.length-1) {
-					add += ', ';
-				}
+				add += '추가' + (parts.length==1?'':(i+1)) + ' : ' + p[3] + ' - '+(p[1]*data.amount)+'개\n';
 			}
 		}
 		result +=
 			'품명 : [ ' + productMap[data.idx_product]+ ' ]' + ' - ' + data.amount + '개\n' +
-			(add.length>0?add+'\n':'') + '\n' +
-			(data.requirement.length>0? '요청사항 : ' + data.requirement : '') + '\n' + 
+			(add.length>0?add:'') + '\n' +
+			(data.requirement.length>0? '요청사항 : ' + data.requirement+'\n' : '') + 
 			'----------------------------------\n';
 	} 
 	
@@ -362,8 +456,8 @@ $('#table').off('click-row.bs.table').on('click-row.bs.table',
 			beforeSend : function(request) {
 				request.setRequestHeader(header, token);
 			},
-			success : function(data) {
-				$('#table2').bootstrapTable('load', data);
+			success : function(e) {
+				$('#table2').bootstrapTable('load', e);
 				
 			},
 			error : function(msg) {
@@ -391,16 +485,14 @@ $('#table2').off('click-row.bs.table').on('click-row.bs.table',
 			for(var i=0; i<parts.length; i++) {
 				var p = parts[i].split('-');
 				if(p[3]) {
-					add += '추가' + i + ' : ' + p[3] + ' - '+(p[1]*data.amount)+'개';
-					if(i!=parts.length-1) {
-						add += ', ';
-					}
+					add += '추가' + (parts.length==1?'':(i+1)) + ' : ' + p[3] + ' - '+(p[1]*data.amount)+'개\n';
+				
 				}
 			}
 			result +=
 				'품명 : [ ' + productMap[data.idx_product]+ ' ]' + ' - ' + data.amount + '개\n' +
-				(add.length>0?add+'\n':'') + '\n' +
-				(data.requirement.length>0? '요청사항 : ' + data.requirement : '') + '\n' + 
+				(add.length>0?add:'') + '\n' +
+				(data.requirement.length>0? '요청사항 : ' + data.requirement + '\n' : '') + 
 				'----------------------------------\n';
 			
 			$('#test').show();
@@ -412,6 +504,31 @@ $('#table2').off('click-row.bs.table').on('click-row.bs.table',
 			
 		}
 	);
+
+// 번호 복사
+$('#copypn').off('click').on('click', function(e) {
+	var selections = $('#table').bootstrapTable('getSelections');
+	if(selections.length <= 0) {
+		alert('번호 복사할 데이터를 선택하세요.');
+		return;
+	}
+
+	var phones = '';
+	for(var index = 0 ; index < selections.length ; index++){
+		phones += selections[index].phonenumber;
+		if(index != selections.length-1) {
+			phones += ',';
+		}
+	}
+
+	$('#copyarea').show();
+	$('#copyarea').val(phones);
+	$('#copyarea')[0].select();
+	//document.execCommand('copy');
+	select_all_and_copy($('#copyarea')[0]);
+	$('#copyarea').hide();
+	alert('복사완료');
+});
 
 // paydone event
 $('#paydone').off('click').on('click', function(e) {

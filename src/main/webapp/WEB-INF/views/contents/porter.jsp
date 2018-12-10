@@ -276,11 +276,9 @@ function copy() {
 	var result = '';
 	
 	result +=
-		'박스번호 : ' + bean.idx_box + '\n' +
-		'주문번호 : ' + bean.idx + '\n' +
-		'고객 연락처 : ' + bean.phonenumber + '\n' +
+		'주문번호 : ' + bean.idx_box + ' (no.' + bean.idx + ')\n' +
 		'배달시간 : ' + bean.receive_date + ' (' + bean.receive_time + ')\n' +
-		' ※ 배달시간 15~20분전에 포터가 음식점에 도착합니다\n' +
+		' ※ 배달시간 15~20분 전에 방문 예정\n' +
 		'----------------------------------\n';
 	
 	for(var j=0; j<datas.length; j++) {
@@ -290,16 +288,17 @@ function copy() {
 		for(var i=0; i<parts.length; i++) {
 			var p = parts[i].split('-');
 			if(p[3]) {
-				add += p[3] + '('+p[1]+'개)';
+				add += '추가' + i + ' : ' + p[3] + ' - '+(p[1]*data.amount)+'개';
 				if(i!=parts.length-1) {
 					add += ', ';
 				}
 			}
 		}
 		result +=
-			'주문 : [' + productMap[data.idx_product]+ ']' + (add.length>0?' + [ ' + add + ']' :'') + '\n' +
-			'개수 : ' + data.amount + '\n' +
-			(data.requirement.length>0? '요청사항 : ' + data.requirement : '') + '\n\n';
+			'품명 : [ ' + productMap[data.idx_product]+ ' ]' + ' - ' + data.amount + '개\n' +
+			(add.length>0?add+'\n':'') + '\n' +
+			(data.requirement.length>0? '요청사항 : ' + data.requirement : '') + '\n' + 
+			'----------------------------------\n';
 	} 
 	
 	$('#test').show();
@@ -381,11 +380,9 @@ $('#table2').off('click-row.bs.table').on('click-row.bs.table',
 			var result = '';
 			
 			result +=
-				'박스번호 : ' + bean.idx_box + '\n' +
-				'주문번호 : ' + bean.idx + '\n' +
-				'고객 연락처 : ' + bean.phonenumber + '\n' +
+				'주문번호 : ' + bean.idx_box + ' (no.' + bean.idx + ')\n' +
 				'배달시간 : ' + bean.receive_date + ' (' + bean.receive_time + ')\n' +
-				' ※ 배달시간 15~20분전에 포터가 음식점에 도착합니다\n' +
+				' ※ 배달시간 15~20분 전에 방문 예정\n' +
 				'----------------------------------\n';
 			
 			var data = row;
@@ -394,16 +391,17 @@ $('#table2').off('click-row.bs.table').on('click-row.bs.table',
 			for(var i=0; i<parts.length; i++) {
 				var p = parts[i].split('-');
 				if(p[3]) {
-					add += p[3] + '('+p[1]+'개)';
+					add += '추가' + i + ' : ' + p[3] + ' - '+(p[1]*data.amount)+'개';
 					if(i!=parts.length-1) {
 						add += ', ';
 					}
 				}
 			}
 			result +=
-				'주문 : [' + productMap[data.idx_product]+ ']' + (add.length>0?' + [ ' + add + ']' :'') + '\n' +
-				'개수 : ' + data.amount + '\n' +
-				(data.requirement.length>0? '요청사항 : ' + data.requirement : '') + '\n\n';
+				'품명 : [ ' + productMap[data.idx_product]+ ' ]' + ' - ' + data.amount + '개\n' +
+				(add.length>0?add+'\n':'') + '\n' +
+				(data.requirement.length>0? '요청사항 : ' + data.requirement : '') + '\n' + 
+				'----------------------------------\n';
 			
 			$('#test').show();
 			$('#test').val(result);

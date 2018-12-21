@@ -64,15 +64,6 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		return result;
 	}
 	
-	public static void main(String...args) {
-		try {
-			System.out.println(new PaymentIndexCrudDAO().getOrderedRestaurant("17"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
 	public void setOrderStatus(Integer status, Integer idx) throws Exception {
 		sqlUpdate("UPDATE payment SET status = ? WHERE idx = ?", status, idx);
 	}

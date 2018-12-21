@@ -127,7 +127,8 @@
 				<div class="modal-body">
 					<div class="table-title" style="background-color: white">
 						<div class="row">
-							<div class="col-sm-6">
+							<div class="col-sm-6" style="color:black;font-size:15px">
+								<b>주문번호 : <span id="idx_payment"></span></b>
 							</div>
 							<div class="col-sm-6">
 								<a class="btn btn-primary" id="copy" onclick="copy()"><span>복사하기</span></a>
@@ -142,13 +143,13 @@
 						<thead>
 							<tr>
 								<th data-field="" data-checkbox="true"></th>
-								<th data-field="idx" data-sortable="true">번호</th>
 								<th data-field="status" data-sortable="true" data-formatter="orderFormatter">주문상태</th>
 								<th data-field="idx_restaurant" data-sortable="true" data-formatter="restaurantFormatter">음식점</th>
 								<th data-field="idx_product" data-sortable="true" data-formatter="productFormatter">제품명</th>
+								<th data-field="amount" data-sortable="true">개수</th>
 								<th data-field="additional" data-sortable="true" data-formatter="additionalFormatter">추가사항</th>
 								<th data-field="requirement" data-sortable="true">요청사항</th>
-								<th data-field="amount" data-sortable="true">개수</th>
+								<th data-field="idx" data-sortable="true">번호</th>
 							</tr>
 						</thead>
 					</table>
@@ -257,7 +258,7 @@ function statusFormatter(value, row) {
 	var result;
 	switch(value) {
 	case 0:
-		result = '결제대기';
+		result = '<b>결제대기</b>';
 		break;
 	case 1:
 		result = '결제완료';
@@ -276,10 +277,10 @@ function orderFormatter(value, row) {
 	var result;
 	switch(value) {
 	case 0:
-		result = '주문대기';
+		result = '<b>주문대기</b>';
 		break;
 	case 1:
-		result = '주문완료';
+		result = '<del>주문완료</del>';
 		break;
 	}
 	return result;
@@ -319,6 +320,12 @@ function order() {
 	var selectedIdxes = '';
 	for(var index = 0 ; index < selections.length ; index++){
 		selectedIdxes += selections[index].idx + ',';
+	}
+	
+	if(bean.status == 0) {
+		if(!confirm('결제대기 상태입니다.\n계속 하시겠습니까?')) {
+			return;
+		}
 	}
 	
 	if(confirm('주문완료 상태로 변경 하시겠습니까?')) {
@@ -457,6 +464,7 @@ $('#table').off('click-row.bs.table').on('click-row.bs.table',
 				request.setRequestHeader(header, token);
 			},
 			success : function(e) {
+				$('#idx_payment').text(bean.idx_box);
 				$('#table2').bootstrapTable('load', e);
 				
 			},
@@ -467,10 +475,34 @@ $('#table').off('click-row.bs.table').on('click-row.bs.table',
 		
 	}
 );
-	
+
+function isChecked4table2(idx) {
+	var sels = $('#table2').bootstrapTable('getSelections');
+	for(var i=0; i<sels.length; i++) {
+		var sel = sels[i];
+		if(sel.idx == idx) {
+			return true;
+		}
+	}
+	return false;
+}
+
 $('#table2').off('click-row.bs.table').on('click-row.bs.table',
 		function(e, row, $element) {
-	
+		
+		if( isChecked4table2(row.idx) ) {
+			var n = $($element[0])[0].rowIndex-1;
+			$('#table2').bootstrapTable('uncheck', n);
+		} else {
+			var n = $($element[0])[0].rowIndex-1;
+			$('#table2').bootstrapTable('check', n);
+		}
+		
+		
+		
+		
+		
+		/*
 			var result = '';
 			
 			result +=
@@ -501,7 +533,7 @@ $('#table2').off('click-row.bs.table').on('click-row.bs.table',
 			//document.execCommand('copy');
 			select_all_and_copy($('#test')[0]);
 			$('#test').hide();
-			
+		*/
 		}
 	);
 

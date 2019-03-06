@@ -9,6 +9,9 @@
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 	<link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
 	<link href="images/favicon.ico" rel="shortcut icon">
+	<link href="css/style.css" rel="stylesheet" type="text/css">
+	<link href="css/widgets.min.css" rel="stylesheet" type="text/css">
+	<link href="css/pixeladmin.min.css" rel="stylesheet" type="text/css">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 	<title>Pomangam CMS</title>
@@ -40,7 +43,19 @@
 							<button type="submit" class="login-button"><i class="fa fa-chevron-right"></i></button>
 						</div>
 					</div>
+					
 					<div class="etc-login-form">
+						<center>
+						로그인 상태 유지
+						<label class="switcher switcher-rounded switcher-lg switcher-primary switcher-blank">
+							<input type="checkbox" id="ob-remember" value="1" checked>
+							<div class="switcher-indicator">
+								<div class="switcher-yes">ON</div>
+								<div class="switcher-no">OFF</div>
+							</div>
+						</label>
+						<center>
+						<br>
 						<p>Inquire of Admin about Access 
 							<br>
 							<center><a onClick="$('#inquire_modal').modal('show');">click here</a><center>
@@ -55,6 +70,7 @@
         <form id="securedLoginForm" name="securedLoginForm" action="./j_spring_security_check" method="post" style="display: none;">
             <input type="hidden" name="securedUsername" id="securedUsername" value="" />
             <input type="hidden" name="securedPassword" id="securedPassword" value="" />
+            <input type="hidden" name="remember" id="remember" value="" />
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </form>
 	</center>

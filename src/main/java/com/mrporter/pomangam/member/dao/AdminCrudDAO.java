@@ -2,6 +2,7 @@ package com.mrporter.pomangam.member.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,31 @@ public class AdminCrudDAO extends Crud<AdminBean> {
 	 */
 	public AdminCrudDAO() {
 		super(TABLENAME);
+	}
+	
+	public AdminBean getMemberWithSession(String session_key) {
+		Connection conn = Config.getInstance().sqlLogin();
+		AdminBean result = null;
+		List<Map<String, Object>> listOfMaps = null;
+		try {
+			QueryRunner queryRunner = new QueryRunner();
+			listOfMaps = queryRunner.query(conn, "SELECT * FROM " + TABLENAME + " WHERE session_key = ? AND session_limit > now();", 
+						new MapListHandler(), session_key);
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DbUtils.closeQuietly(conn);
+		}
+		
+		if(!listOfMaps.isEmpty()) {
+			Gson gson = new Gson();
+			result = new Gson().fromJson(gson.toJson(listOfMaps.get(0)), 
+					new TypeToken<AdminBean>() {}.getType());
+		}
+		return result;
+	}
+	public void rememberSession(String session_key, Date session_limit, String username) throws Exception {
+		sqlUpdate("UPDATE " + TABLENAME + " SET session_key = ?, session_limit = ? WHERE username = ? ", session_key, session_limit, username);
 	}
 	
 	public String getAdminList() throws Exception {

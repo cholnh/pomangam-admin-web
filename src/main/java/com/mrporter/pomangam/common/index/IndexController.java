@@ -2,18 +2,28 @@ package com.mrporter.pomangam.common.index;
 
 import java.io.IOException;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.util.WebUtils;
 
+import com.google.gson.Gson;
 import com.mrporter.pomangam.common.pattern.vo.Status;
+import com.mrporter.pomangam.common.security.model.UserService;
+import com.mrporter.pomangam.common.security.model.domain.User;
+import com.mrporter.pomangam.member.dao.AdminCrudDAO;
+import com.mrporter.pomangam.member.vo.AdminBean;
 import com.mrporter.pomangam.order.dao.PaymentCrudDAO;
 
 /**
@@ -21,13 +31,31 @@ import com.mrporter.pomangam.order.dao.PaymentCrudDAO;
  */
 @Controller
 public class IndexController {
+	@Autowired
+    UserService userService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(IndexController.class);
 	
 	@Secured({"ROLE_USER"})
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String openDefaultPage() {
+	public String openDefaultPage(HttpServletRequest request) {
 		logger.info("Welcome home!");
+		
+		HttpSession session = request.getSession();
+		Object obj = session.getAttribute("user");
+		if(obj == null) {
+			Cookie cookie = WebUtils.getCookie(request, "loginCookie");
+			if(cookie != null) {
+				String session_key = cookie.getValue();
+				//System.out.println("session_key : " + session_key);
+				AdminBean bean = new AdminCrudDAO().getMemberWithSession(session_key);
+				if(bean != null) {
+					User user = userService.loadUserByUsername(bean.getUsername());
+					user.setPassword("");
+		            session.setAttribute("user", new Gson().toJson(user));
+				}
+			}
+		}
 		
 		return "contents/home";
 	}

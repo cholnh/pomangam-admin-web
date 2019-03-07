@@ -2,8 +2,11 @@ package com.mrporter.pomangam.common.security;
 
 import java.security.PrivateKey;
 import java.util.Collection;
+import java.util.Date;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -27,6 +30,7 @@ import com.mrporter.pomangam.common.security.model.UserService;
 import com.mrporter.pomangam.common.security.model.domain.User;
 import com.mrporter.pomangam.common.security.password.PasswordEncoding;
 import com.mrporter.pomangam.common.security.password.SHAPasswordEncoder;
+import com.mrporter.pomangam.member.dao.AdminCrudDAO;
 
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
@@ -39,6 +43,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     		throws AuthenticationException {
     	HttpServletRequest request = 
     			((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+    	HttpServletResponse response = 
+    			((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getResponse();
+    	
     	HttpSession session = request.getSession();
     	try {
     		SHAPasswordEncoder shaPasswordEncoder = new SHAPasswordEncoder(512);
@@ -49,6 +56,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     		PrivateKey privateKey = (PrivateKey) session.getAttribute("__rsaPrivateKey__");
     		String username = decryptRSA(privateKey, authentication.getName());
             String password = decryptRSA(privateKey, (String) authentication.getCredentials());
+            boolean isRemember = Boolean.parseBoolean(request.getParameter("remember"));
+            
             User user;
             Collection<? extends GrantedAuthority> authorities;
             try {
@@ -68,6 +77,21 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             }
             user.setPassword("");
             session.setAttribute("user", new Gson().toJson(user));
+            
+            if(isRemember) {
+            	int amount = 60*60*24*7;	// 7days
+            	Cookie cookie = new Cookie("loginCookie", session.getId());
+            	cookie.setPath("/");
+            	cookie.setMaxAge(amount);
+            	response.addCookie(cookie);
+            	
+            	Date session_limit = new Date(System.currentTimeMillis() + (1000*amount));
+            	try {
+					new AdminCrudDAO().rememberSession(session.getId(), session_limit, username);
+				} catch (Exception e) {
+					e.printStackTrace();
+				};
+            }
             
             return new UsernamePasswordAuthenticationToken(user, password, authorities);
     	} finally {

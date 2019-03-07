@@ -57,12 +57,20 @@
 				<div class="col-sm-6">
 				</div>
 				<div class="col-sm-6">
-					<a class="btn btn-info" id="export"><i
-						class="ion-android-download"></i> <span>내보내기</span></a>
-					<a class="btn btn-primary" id="copypn"><span>번호복사</span></a>
-					<a class="btn btn-primary" id="total"><span>전체보기</span></a>
+					<!-- <a class="btn btn-info" id="export"><i
+						class="ion-android-download"></i> <span>내보내기</span></a> -->
+					<a class="btn btn-info" id="copypn"><span>번호복사</span></a>
+					<a class="btn btn-info" id="total"><span>전체보기</span></a>
+					<a class="btn btn-info" id="viewdetail"><span>상세보기</span></a>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-6">
+				</div>
+				<div class="col-sm-6">
+					<a class="btn btn-primary" id="paycancel"><span>주문취소</span></a>
+					<a class="btn btn-primary" id="payrefund"><span>주문환불</span></a>
 					<a class="btn btn-primary" id="paydone"><span>입금처리</span></a>
-					
 				</div>
 			</div>
 		</div>
@@ -91,6 +99,7 @@
 				<col style="width:auto">
 				
 			</colgroup>
+			<textarea id="copyarea"></textarea>
 			<thead>
 				<tr>
 					<th data-field="" data-checkbox="true"></th>
@@ -110,7 +119,7 @@
 				</tr>
 			</thead>
 		</table>
-		<textarea id="copyarea"></textarea>
+		
 	</div>
 </div>
 
@@ -128,7 +137,7 @@
 					<div class="table-title" style="background-color: white">
 						<div class="row">
 							<div class="col-sm-6" style="color:black;font-size:15px">
-								<b>주문번호 : <span id="idx_payment"></span></b>
+								<b>주문번호 : <span id="idx_payment"></span></b><br> (<span id="order_status"></span>)
 							</div>
 							<div class="col-sm-6">
 								<a class="btn btn-primary" id="copy" onclick="copy()"><span>복사하기</span></a>
@@ -136,7 +145,7 @@
 							</div>
 						</div>
 					</div>
-					
+					<textarea id="test"></textarea>
 					<table id="table2" class="table table-responsive" data-toggle="table" data-show-refresh="true"
 						data-mobile-responsive="true" style="background-color: white; -webkit-overflow-scrolling:touch;"
 						data-search="true" data-pagination="true">
@@ -153,7 +162,6 @@
 							</tr>
 						</thead>
 					</table>
-					<textarea id="test"></textarea>
 				</div>
 				<div class="modal-footer">
 					<button type="button submit" class="btn btn-primary">확 인</button>
@@ -255,22 +263,7 @@ function boxStyle(value, row, index, field) {
 }
 
 function statusFormatter(value, row) {
-	var result;
-	switch(value) {
-	case 0:
-		result = '<b>결제대기</b>';
-		break;
-	case 1:
-		result = '결제완료';
-		break;
-	case 2:
-		result = '결제실패';
-		break;
-	case 3:
-		result = '배달완료';
-		break;
-	}
-	return result;
+	return statusMap(value);
 }
 
 function orderFormatter(value, row) {
@@ -443,15 +436,58 @@ function select_all_and_copy(el) {
 	}
 } 
 
+/*
+$('#table')
+.on('dbl-click-row.bs.table', function (e, row, $element) {
+	viewDetail(row);
+});
+*/
+
+var touchtime = 0;
+
 var bean;
 
 $('#table').off('click-row.bs.table').on('click-row.bs.table',
 	function(e, row, $element) {
+	
+	if (touchtime == 0) {
+        // set first click
+        touchtime = new Date().getTime();
+        if( isChecked4table(row.idx) ) {
+    		var n = $($element[0])[0].rowIndex-1;
+    		$('#table').bootstrapTable('uncheck', n);
+    	} else {
+    		var n = $($element[0])[0].rowIndex-1;
+    		$('#table').bootstrapTable('check', n);
+    	}
+        
+    } else {
+        if (((new Date().getTime()) - touchtime) < 300) {
+            // double click occurred
+            touchtime = 0;
+            viewDetail(row);
+        } else {
+            // not a double click so set as a new first click
+            touchtime = new Date().getTime();
+            if( isChecked4table(row.idx) ) {
+        		var n = $($element[0])[0].rowIndex-1;
+        		$('#table').bootstrapTable('uncheck', n);
+        	} else {
+        		var n = $($element[0])[0].rowIndex-1;
+        		$('#table').bootstrapTable('check', n);
+        	}
+        }
+    }
+	
+	
+	/*
 		bean = row;
 		$('#table2').bootstrapTable('removeAll');
 		$('#detailInfo').modal({backdrop: 'static'});
 		$('#detailInfo').modal('show');
-	
+		
+		$('#order_status').text(statusMap2(bean.status)); // $element[0].children[1].innerText
+		
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");	
 		$.ajax({
@@ -472,9 +508,78 @@ $('#table').off('click-row.bs.table').on('click-row.bs.table',
 				alert('ajax error' + msg);
 			}
 		});
-		
+	*/	
 	}
 );
+
+function statusMap(value) {
+	var result;
+	switch(value) {
+	case 0:
+		result = '<b>결제대기</b>';
+		break;
+	case 1:
+		result = '결제완료';
+		break;
+	case 2:
+		result = '결제실패';
+		break;
+	case 3:
+		result = '배달완료';
+		break;
+	case 4:
+		result = '<del>취소</del>';
+		break;
+	case 5:
+		result = '환불';
+		break;
+	case 6:
+		result = '<b>주문발송실패</b>';
+		break;	
+	}
+	
+	return result;
+}
+
+function statusMap2(value) {
+	var result;
+	switch(value) {
+	case 0:
+		result = '결제대기';
+		break;
+	case 1:
+		result = '결제완료';
+		break;
+	case 2:
+		result = '결제실패';
+		break;
+	case 3:
+		result = '배달완료';
+		break;
+	case 4:
+		result = '취소';
+		break;
+	case 5:
+		result = '환불';
+		break;
+	case 6:
+		result = '주문발송실패';
+		break;	
+	}
+	
+	return result;
+}
+
+function isChecked4table(idx) {
+	var sels = $('#table').bootstrapTable('getSelections');
+	for(var i=0; i<sels.length; i++) {
+		var sel = sels[i];
+		if(sel.idx == idx) {
+			return true;
+		}
+	}
+	return false;
+}
 
 function isChecked4table2(idx) {
 	var sels = $('#table2').bootstrapTable('getSelections');
@@ -562,6 +667,124 @@ $('#copypn').off('click').on('click', function(e) {
 	alert('복사완료');
 });
 
+function viewDetail(selection) {
+	
+	if(!selection) {
+		alert('상세보기할 데이터를 선택하세요.');
+		return;
+	}
+	bean = selection;
+	
+	$('#table2').bootstrapTable('removeAll');
+	$('#detailInfo').modal({backdrop: 'static'});
+	$('#detailInfo').modal('show');
+	
+	$('#order_status').text(statusMap2(bean.status)); // $element[0].children[1].innerText
+	
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");	
+	$.ajax({
+		type : "POST",
+		url : './porter/getdetail.do',
+		data : {
+			idxes_payment : bean.idxes_payment
+		},
+		beforeSend : function(request) {
+			request.setRequestHeader(header, token);
+		},
+		success : function(e) {
+			$('#idx_payment').text(bean.idx_box);
+			$('#table2').bootstrapTable('load', e);
+			
+		},
+		error : function(msg) {
+			alert('ajax error' + msg);
+		}
+	});
+}
+
+$('#viewdetail').off('click').on('click', function(e) {
+	var selections = $('#table').bootstrapTable('getSelections');
+	if(selections.length == 1) {
+		viewDetail(selections[0]);
+	} else {
+		alert('상세보기할 데이터를 하나만 선택해 주세요.');
+	}
+});
+
+$('#paycancel').off('click').on('click', function(e) {
+	var selections = $('#table').bootstrapTable('getSelections');
+	if(selections.length <= 0) {
+		alert('상태를 변경할 데이터를 선택하세요.');
+		return;
+	}
+	
+	var selectedIdxes = '';
+	for(var index = 0 ; index < selections.length ; index++){
+		selectedIdxes += selections[index].idx + ',';
+	}
+	
+	if(confirm('취소 상태로 변경 하시겠습니까?')) {
+		var isMsg = confirm('업체에게 전송 하시겠습니까?');
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		$.ajax({
+			type : "POST",
+			url : './porter/setcancel.do',
+			data : {
+				idxes: selectedIdxes,
+				isMsg: isMsg
+			},
+			beforeSend : function(request) {
+				request.setRequestHeader(header, token);
+			},
+			success : function(data) {
+				$('#table').bootstrapTable('refresh');
+			},
+			error : function(msg) {
+				alert('ajax error' + msg);
+			}
+		});
+	}
+	
+});
+
+$('#payrefund').off('click').on('click', function(e) {
+	var selections = $('#table').bootstrapTable('getSelections');
+	if(selections.length <= 0) {
+		alert('상태를 변경할 데이터를 선택하세요.');
+		return;
+	}
+	
+	var selectedIdxes = '';
+	for(var index = 0 ; index < selections.length ; index++){
+		selectedIdxes += selections[index].idx + ',';
+	}
+	
+	if(confirm('환불 상태로 변경 하시겠습니까?')) {
+		var isMsg = confirm('업체에게 전송 하시겠습니까?');
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+		$.ajax({
+			type : "POST",
+			url : './porter/setrefund.do',
+			data : {
+				idxes: selectedIdxes,
+				isMsg: isMsg
+			},
+			beforeSend : function(request) {
+				request.setRequestHeader(header, token);
+			},
+			success : function(data) {
+				$('#table').bootstrapTable('refresh');
+			},
+			error : function(msg) {
+				alert('ajax error' + msg);
+			}
+		});
+	}
+});
+
 // paydone event
 $('#paydone').off('click').on('click', function(e) {
 	var selections = $('#table').bootstrapTable('getSelections');
@@ -576,13 +799,15 @@ $('#paydone').off('click').on('click', function(e) {
 	}
 	
 	if(confirm('입금완료 상태로 변경 하시겠습니까?')) {
+		var isMsg = confirm('업체에게 전송 하시겠습니까?');
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
 		$.ajax({
 			type : "POST",
 			url : './porter/setdone.do',
 			data : {
-				idxes: selectedIdxes
+				idxes: selectedIdxes,
+				isMsg: isMsg
 			},
 			beforeSend : function(request) {
 				request.setRequestHeader(header, token);

@@ -130,8 +130,17 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.13.1/jquery.validate.min.js"></script>
 	<script src="js/loginform.js"></script>
 	<script src='js/sha512.js'></script>
+	<script src='js/common.js'></script>
 	
 	<script>
+		var userId = getCookie("cookieUsername"); 
+	    $("#username").val(userId); 
+	     
+	    if($("#username").val() != ""){
+	        $("#remember").attr("checked", true);
+	    }
+	
+	
 		var status = <%=new Gson().toJson(request.getSession().getAttribute("status")) %>;
 		var error = '${error}';
 		var msg = '${msg}';

@@ -26,6 +26,12 @@ public class Date {
 		return dtf.format(now);
 	}
 	
+	public static String getCurTime2() {
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		LocalDateTime now = LocalDateTime.now();
+		return dtf.format(now);
+	}
+	
 	public static String getCurDay() {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		LocalDateTime now = LocalDateTime.now();

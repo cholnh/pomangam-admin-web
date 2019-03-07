@@ -122,19 +122,31 @@
   		}, 1000);
   		form_success($form);
   		setTimeout(function() {
+  			
   			var username = document.getElementById("username").value;
   		    var password = document.getElementById("password").value;
   		    try {
+  		    	
+  		    	var isRemember = $("#ob-remember").is(":checked");
+  		    	/*
+  		    	if(isRemember){
+		            var userId = $("#username").val();
+		            setCookie("cookieUsername", userId, 7); // 7일동안 쿠키 보관
+		            
+		        } else {
+		            deleteCookie("cookieUsername");
+		        }
+		        */
   		        var rsaPublicKeyModulus = document.getElementById("rsaPublicKeyModulus").value;
   		        var rsaPublicKeyExponent = document.getElementById("rsaPublicKeyExponent").value;
-  		        submitEncryptedForm(username,password, rsaPublicKeyModulus, rsaPublicKeyExponent);
+  		        submitEncryptedForm(username,password, rsaPublicKeyModulus, rsaPublicKeyExponent, isRemember);
   		    } catch(err) {
   		        alert(err);
   		    }
   		}, 1000);
   	}
   }
-	function submitEncryptedForm(username, password, rsaPublicKeyModulus, rsaPpublicKeyExponent) {
+	function submitEncryptedForm(username, password, rsaPublicKeyModulus, rsaPpublicKeyExponent, isRemember) {
 	    var rsa = new RSAKey();
 	    rsa.setPublic(rsaPublicKeyModulus, rsaPpublicKeyExponent);
 	
@@ -146,6 +158,7 @@
 	    var securedLoginForm = document.getElementById("securedLoginForm");
 	    securedLoginForm.securedUsername.value = securedUsername;
 	    securedLoginForm.securedPassword.value = securedPassword;
+	    securedLoginForm.remember.value = isRemember;
 	    securedLoginForm.submit();
 	}
 	

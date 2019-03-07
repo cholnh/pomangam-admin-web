@@ -54,6 +54,8 @@ public class AdminCrudDAO extends Crud<AdminBean> {
 			Gson gson = new Gson();
 			result = new Gson().fromJson(gson.toJson(listOfMaps.get(0)), 
 					new TypeToken<AdminBean>() {}.getType());
+		} else {
+			return null;
 		}
 		return result;
 	}

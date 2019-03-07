@@ -36,9 +36,10 @@ public class IndexController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(IndexController.class);
 	
-	@Secured({"ROLE_USER"})
+	//@Secured({"ROLE_USER"})
 	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String openDefaultPage(HttpServletRequest request) {
+	public String openDefaultPage(HttpServletRequest request, 
+									HttpServletResponse response) {
 		logger.info("Welcome home!");
 		
 		HttpSession session = request.getSession();
@@ -50,10 +51,27 @@ public class IndexController {
 				//System.out.println("session_key : " + session_key);
 				AdminBean bean = new AdminCrudDAO().getMemberWithSession(session_key);
 				if(bean != null) {
+					//System.out.println("0");
 					User user = userService.loadUserByUsername(bean.getUsername());
 					user.setPassword("");
 		            session.setAttribute("user", new Gson().toJson(user));
+				} else {
+					//System.out.println("1");
+					try {
+						response.sendRedirect("./login.do");
+					} catch (IOException e) {
+						e.printStackTrace();
+					} 
+					return "login";
 				}
+			} else {
+				//System.out.println("2");
+				try {
+					response.sendRedirect("./login.do");
+				} catch (IOException e) {
+					e.printStackTrace();
+				} 
+				return "login";
 			}
 		}
 		

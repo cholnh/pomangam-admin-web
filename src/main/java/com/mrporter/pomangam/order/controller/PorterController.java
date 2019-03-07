@@ -2,10 +2,12 @@ package com.mrporter.pomangam.order.controller;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.mrporter.pomangam.common.pattern.vo.Status;
+import com.mrporter.pomangam.common.security.model.UserService;
+import com.mrporter.pomangam.order.dao.PaymentCrudDAO;
 import com.mrporter.pomangam.order.dao.PaymentIndexCrudDAO;
 import com.mrporter.pomangam.product.dao.ProductCrudDAO;
 import com.mrporter.pomangam.restaurant.dao.RestaurantCrudDAO;
@@ -21,18 +25,22 @@ import com.mrporter.pomangam.target.dao.TargetCrudDAO;
 
 @Controller
 public class PorterController {
+	@Autowired
+    UserService userService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(PorterController.class);
 	private static final String MAPPINGNAME = "porter";
 	
 	@RequestMapping(value = "/"+MAPPINGNAME+".do")
 	public ModelAndView openIndexPage(
+			HttpServletRequest request, 
+			HttpServletResponse response,
 			@RequestParam(value = "time", required = false) String time) throws Exception {
 
 		//PaymentIndexCrudDAO indexDAO = new PaymentIndexCrudDAO();
-		
 		ModelAndView model = new ModelAndView();
 		model.setViewName("contents/" + MAPPINGNAME);
+		
 		model.addObject("targetList", new TargetCrudDAO().getCompactList());
 		model.addObject("restaurantList", new RestaurantCrudDAO().getCompactList());
 		model.addObject("restaurantBeanList", new RestaurantCrudDAO().getBeanList());
@@ -46,19 +54,110 @@ public class PorterController {
 		return model;
 	}
 	
+	//private final static String msg1 = "[포만감] 인증번호 : ";
+    //private final static String msg2 = "\n정확히 입력해주세요.";
+    //private final static String tmplId = "pmg_auth_1";
+	
 	@RequestMapping(value = "/"+MAPPINGNAME+"/setdone.do", 
 			produces = "application/json; charset=utf-8")
 	public @ResponseBody void setDone(
-			@RequestParam(value = "idxes", required = false) String idxes) throws Exception {
+			@RequestParam(value = "idxes", required = false) String idxes,
+			@RequestParam(value = "isMsg", required = false) boolean isMsg) throws Exception {
 		PaymentIndexCrudDAO indexDAO = new PaymentIndexCrudDAO();
+		PaymentCrudDAO payDAO = new PaymentCrudDAO();
 		if(idxes!=null) {
 			for(String idx : idxes.split(",")) {
-				indexDAO.setStatus(1, Integer.parseInt(idx));
+				int pi = Integer.parseInt(idx);
+				indexDAO.setStatus(1, pi);
+				if(isMsg) {
+					payDAO.sendOrderMsg(pi);
+				}
 			}
 		}
 		
 	}
 	
+	@RequestMapping(value = "/"+MAPPINGNAME+"/setcancel.do", 
+			produces = "application/json; charset=utf-8")
+	public @ResponseBody void setCancel(
+			@RequestParam(value = "idxes", required = false) String idxes,
+			@RequestParam(value = "isMsg", required = false) boolean isMsg) throws Exception {
+		PaymentIndexCrudDAO indexDAO = new PaymentIndexCrudDAO();
+		PaymentCrudDAO payDAO = new PaymentCrudDAO();
+		if(idxes!=null) {
+			for(String idx : idxes.split(",")) {
+				int pi = Integer.parseInt(idx);
+				indexDAO.setStatus(4, pi);
+				if(isMsg) {
+					payDAO.sendFailMsg(pi, "취소");
+				}
+			}
+		}
+		
+	}
+	
+	@RequestMapping(value = "/"+MAPPINGNAME+"/setrefund.do", 
+			produces = "application/json; charset=utf-8")
+	public @ResponseBody void setRefund(
+			@RequestParam(value = "idxes", required = false) String idxes,
+			@RequestParam(value = "isMsg", required = false) boolean isMsg) throws Exception {
+		PaymentIndexCrudDAO indexDAO = new PaymentIndexCrudDAO();
+		PaymentCrudDAO payDAO = new PaymentCrudDAO();
+		if(idxes!=null) {
+			for(String idx : idxes.split(",")) {
+				int pi = Integer.parseInt(idx);
+				indexDAO.setStatus(5, pi);
+				if(isMsg) {
+					payDAO.sendFailMsg(pi, "환불");
+				}
+			}
+		}
+		
+	}
+	
+	/*
+	public static void main(String...args) {
+		//System.out.println(BizmApi.send("821064784899", (msg1 + "1234" + msg2), tmplId));
+		sendtest();
+	}
+	
+	
+	public static void sendtest() {
+		String tmplId = "pmg_admin_3";
+		
+		Integer boxNumber = 1234;
+		Integer orderNumber = 554422;
+		String arrivalDateTime = "2019-03-07 12:00";
+		String takeTime = "11:45";
+		String detail = "test^^";
+		
+		Calendar cal1 = Calendar.getInstance();
+		Calendar cal2 = Calendar.getInstance();
+		
+		try {
+			cal1.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(arrivalDateTime));
+			cal2.setTime(new SimpleDateFormat("HH:mm").parse(takeTime));
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		String text = "주문번호 : " + boxNumber + " (no." + orderNumber + ")" + System.lineSeparator() +
+					"배달시간 : " + cal1.get(Calendar.YEAR) + "-" + timeWithZero(cal1.get(Calendar.MONTH)) + "-" + timeWithZero(cal1.get(Calendar.DATE)) + " (" + timeWithZero(cal1.get(Calendar.HOUR_OF_DAY)) + "시 " + timeWithZero(cal1.get(Calendar.MINUTE)) + "분)" + System.lineSeparator() +
+					"※ " + timeWithZero(cal2.get(Calendar.HOUR_OF_DAY)) + "시 " + timeWithZero(cal2.get(Calendar.MINUTE)) + "분에 방문 예정 ※" + System.lineSeparator() +
+					"------------------------" + System.lineSeparator() +
+					"품명 : " + detail;
+		System.out.println(text);
+		//System.out.println(BizmApi.send("821064784899", text, tmplId));
+	}
+	
+	private static String timeWithZero(int n) {
+		if(n < 10) {
+			return "0"+n;
+		}
+		return n+"";
+	}
+	*/
 	@RequestMapping(value = "/"+MAPPINGNAME+"/setorderdone.do", 
 			produces = "application/json; charset=utf-8")
 	public @ResponseBody void setOrderDone(

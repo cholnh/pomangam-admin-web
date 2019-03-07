@@ -55,11 +55,6 @@ public class LoginController {
 		logger.info("login index - " + error);
 
 		ModelAndView model = new ModelAndView();
-
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if(!authentication.getName().equals("anonymousUser")) {
-			response.sendRedirect("./"); 
-		}
 		
 		HttpSession session = request.getSession();
 		Object obj = session.getAttribute("user");
@@ -78,6 +73,13 @@ public class LoginController {
 		} else {
 			response.sendRedirect("./"); 
 		}
+		
+		/*
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if(!authentication.getName().equals("anonymousUser")) {
+			response.sendRedirect("./"); 
+		}
+		*/
 		
 		if (error != null) {
 			model.addObject("error", "Invalid username and password!");

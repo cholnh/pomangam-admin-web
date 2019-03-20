@@ -43,6 +43,8 @@
 					<th data-field="price" data-sortable="true" data-formatter="priceFormatter">총 가격</th>
 					<th data-field="status" data-sortable="true">처리상태</th>
 					<th data-field="cashreceipt" data-sortable="true">현금영수증</th>
+					<th data-field="c_commission_prc" data-sortable="true">고객수수료</th>
+					<th data-field="s_commission_prc" data-sortable="true">업체수수료</th>
 					
 				</tr>
 			</thead>
@@ -68,7 +70,6 @@ function priceFormatter(value, row) {
 	}
 	return parseInt(value) + partTotal;
 }
-
 
 $('#ob-gdate').change(function() {
 	var $this = $(this);

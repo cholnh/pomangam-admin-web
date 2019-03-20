@@ -80,14 +80,17 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		List<Map<String, Object>> lom 
 		= sqlQuery(
 				"SELECT " +
-					"pay.idx, pi.idx as pi_idx, res.name as res_name, pay.amount, pay.additional, pro.name as pro_name, pro.price, pi.status, pi.cashreceipt " +
+					"pay.idx, pi.idx as pi_idx, res.name as res_name, pay.amount, pay.additional, pro.name as pro_name, pro.price, pi.status, pi.cashreceipt, pro.c_commission_prc, pro.s_commission_prc " +
 				"FROM " +
 					"payment pay, product pro, restaurant res, payment_index pi " +
 				"WHERE " + 
 					"pi.receive_date = ? and " +
-					"pi.idx = pay.idx_payment_index  and " +
+		 			"pi.idx = pay.idx_payment_index  and " +
 					"pay.idx_product = pro.idx and " +
-					"pay.idx_restaurant = res.idx ", date);
+					"pay.idx_restaurant = res.idx and pi.status = (1|3) ORDER BY res_name", date);
+		
+		Gson gson = new Gson();
+		List<PaymentIndexBean> list = gson.fromJson(gson.toJson(lom), new TypeToken<List<PaymentIndexBean>>() {}.getType());
 		
 		return new Gson().toJson(lom);
 	}

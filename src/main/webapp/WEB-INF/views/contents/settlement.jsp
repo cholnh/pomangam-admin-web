@@ -15,11 +15,39 @@
 	<div class="container" style="-webkit-overflow-scrolling:touch;">
 
 		<div class="table-title" style="background-color: #f5f5f5">
+			<div style="color:black; text-align:right; margin-bottom:18px;">
+				<span><b>정산날짜 : </b>&nbsp;</span>
+				<input id="ob-gdate" type="text" placeholder="년도 - 월 - 일" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}">
+			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					<div style="color:black">
-						<input id="ob-gdate" type="text" placeholder="날짜 입력 : yyyy-mm-dd" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}">
-					</div>
+				</div>
+				<div class="col-sm-6">
+					<a class="btn btn-info" id="export"><i
+						class="ion-android-download"></i> <span>내보내기</span></a>
+					<a class="btn btn-primary" id="load"><span>정산하기</span></a>
+				</div>
+			</div>
+		</div>
+		
+		<table id="table2" data-toggle="table" data-show-refresh="true"
+			data-mobile-responsive="true" style="background-color: white; -webkit-overflow-scrolling:touch;"
+			data-search="true"
+			data-url="./settlement/getautolist.do">
+			<thead>
+				<tr>
+					<th data-field="res_name">음식점</th>
+					<th data-field="amount">총 판매 수량</th>
+					<th data-field="sales">총 매출</th>
+					<th data-field="commission">총 수수료</th>
+					<th data-field="purchase">총 매입</th>
+				</tr>
+			</thead>
+		</table>
+		<hr style="margin-top:64px;margin-bottom:32px">
+		<div class="table-title" style="background-color: #f5f5f5; ">
+			<div class="row">
+				<div class="col-sm-6">
 				</div>
 				<div class="col-sm-6">
 					<a class="btn btn-info" id="export"><i
@@ -27,6 +55,7 @@
 				</div>
 			</div>
 		</div>
+		
 		<table id="table" data-toggle="table" data-show-refresh="true"
 			data-mobile-responsive="true" style="background-color: white; -webkit-overflow-scrolling:touch;"
 			data-search="true" data-pagination="true"
@@ -54,6 +83,9 @@
 </div>
 
 <script>
+
+$('#ob-gdate').val(new Date().format("yyyy-MM-dd"));
+
 function nameFormatter(value, row) {
 	return value + '(' + row.price + ')';
 }
@@ -71,8 +103,13 @@ function priceFormatter(value, row) {
 	return parseInt(value) + partTotal;
 }
 
-$('#ob-gdate').change(function() {
-	var $this = $(this);
+$('#load').on('click', function(e) {
+	$('#table').bootstrapTable('removeAll');
+	$('#table2').bootstrapTable('removeAll');
+	$('#table').bootstrapTable('showLoading');
+	$('#table2').bootstrapTable('showLoading');
+	
+	var $this = $('#ob-gdate');
 	
 	if($this.val().length > 10) {
 		alert('20xx-xx-xx 형식에 맞추세요.\n예시 : 2018-09-12');
@@ -90,15 +127,68 @@ $('#ob-gdate').change(function() {
 			},
 			success : function(data) {
 				$('#table').bootstrapTable('load', data);
-				alert('데이터 로드 완료');
-				$('#ob-gdate').val('');
+				$('#table').bootstrapTable('hideLoading');
+				//alert('데이터 로드 완료');
+				//$('#ob-gdate').val('');
 			},
 			error : function(msg) {
 				alert('ajax error' + msg);
+				$('#table').bootstrapTable('hideLoading');
+			}
+		});
+		
+		$.ajax({
+			type : "POST",
+			url : './settlement/getautolist.do',
+			data : {
+				date : $this.val()
+			},
+			beforeSend : function(request) {
+				request.setRequestHeader(header, token);
+			},
+			success : function(data) {
+				$('#table2').bootstrapTable('load', data);
+				$('#table2').bootstrapTable('hideLoading');
+				calTotal();
+				//alert('데이터 로드 완료');
+				//$('#ob-gdate').val('');
+			},
+			error : function(msg) {
+				alert('ajax error' + msg);
+				$('#table2').bootstrapTable('hideLoading');
 			}
 		});
 	}
 });
+
+function calTotal() {
+	var datas = $('#table2').bootstrapTable('getData');
+	var last = datas.length;
+	
+	var amountTotal = 0;
+	var salesTotal = 0;
+	var commissionTotal = 0;
+	var purchaseTotal = 0;
+	
+	for(var i=0; i<last; i++) {
+		var data = datas[i];
+		amountTotal += data.amount;
+		salesTotal += data.sales;
+		commissionTotal += data.commission;
+		purchaseTotal += data.purchase;
+	}
+	$('#table2').bootstrapTable('insertRow', {index: last, row: {
+		res_name : "<b style=\"color:red; font-size:18px;\">총 합</b>", 
+		amount : "<b style=\"color:red; font-size:18px;\">" + numberWithCommas(amountTotal) + "개</b>", 
+		sales : "<b style=\"color:red; font-size:18px;\">" + numberWithCommas(salesTotal) + "원</b>", 
+		commission : "<b style=\"color:red; font-size:18px;\">" + numberWithCommas(commissionTotal) + "원</b>", 
+		purchase : "<b style=\"color:red; font-size:18px;\">" + numberWithCommas(purchaseTotal) + "원</b>"
+	}});
+}
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 
 $(document).ready(function() {
 	// export event

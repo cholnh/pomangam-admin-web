@@ -93,25 +93,86 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		return new Gson().toJson(lom);
 	}
 	
+	public String getAutoSettlement() throws Exception {
+		return getAutoSettlement(Date.getCurDay());
+	}
+	
 	public String getAutoSettlement(String date) throws Exception {
 		List<Map<String, Object>> lom 
 		= sqlQuery(
-				"SELECT " +
-					"res.name as res_name, pay.amount, pay.additional, pro.price, pro.c_commission_prc, pro.s_commission_prc " +
+				"SELECT " + 
+				    "res.name AS res_name, " +
+				    "SUM((pro.c_commission_prc + pro.s_commission_prc) * pay.amount) AS commission " +
 				"FROM " +
-					"payment pay, product pro, restaurant res, payment_index pi " +
+				    "payment pay, product pro, restaurant res, payment_index pi " +
 				"WHERE " + 
-					"pi.receive_date = ? and " +
-		 			"pi.idx = pay.idx_payment_index  and " +
-					"pay.idx_product = pro.idx and " +
-					"pay.idx_restaurant = res.idx and pi.status = (1|3) ORDER BY res_name", date);
+				    "pi.receive_date = ? " +
+				        "AND pi.idx = pay.idx_payment_index " +
+				        "AND pay.idx_product = pro.idx " +
+				        "AND pay.idx_restaurant = res.idx " +
+				        "AND pi.status = (1 | 3) " +
+				"GROUP BY res_name", date);
 		
-		Gson gson = new Gson();
-		List<SettlementBean> list = gson.fromJson(gson.toJson(lom), new TypeToken<List<SettlementBean>>() {}.getType());
+		if(lom==null||lom.isEmpty()) { 
+			return null; 
+		}
 		
-		return new Gson().toJson(lom);
+		List<SettlementBean> list = new ArrayList<>();
+		
+		for(Map<String, Object> map : lom) {
+			SettlementBean bean = new SettlementBean();
+			String res_name = map.get("res_name")+"";
+			int commission = map.get("commission")==null
+					? 0
+					: Integer.parseInt(map.get("commission")+"");
+			
+			List<Map<String, Object>> lom2 
+			= sqlQuery(
+					"SELECT " + 
+					    "pay.amount AS amount, pay.additional AS additional, pro.price AS price " +
+					"FROM " +
+					    "payment pay, product pro, restaurant res, payment_index pi " +
+					"WHERE " + 
+					    "pi.receive_date = ? " +
+					        "AND pi.idx = pay.idx_payment_index " +
+					        "AND pay.idx_product = pro.idx " +
+					        "AND pay.idx_restaurant = res.idx " +
+					        "AND pi.status = (1 | 3) " +
+					        "AND res.name = ?", date, res_name);
+			
+			int amountTotal = 0;
+			int sales = 0;
+			for(Map<String, Object> map2 : lom2) {
+				int additionalPrice = 0;
+				int amount = Integer.parseInt(map2.get("amount")+"");
+				amountTotal += amount;
+				if(!(map2.get("additional")+"").trim().equals("")) {
+					String[] additionals = (map2.get("additional")+"").split(",");
+					for(String part : additionals) {
+						String[] additional = part.split("-");
+						additionalPrice += Integer.parseInt(additional[1]) * Integer.parseInt(additional[2]);
+					}
+				}
+				sales += (additionalPrice + Integer.parseInt(map2.get("price")+"")) * amount;
+			}
+			
+			bean.setRes_name(res_name);
+			bean.setAmount(amountTotal);
+			bean.setSales(sales);
+			bean.setCommission(commission);
+			bean.setPurchase(sales-commission);
+			list.add(bean);
+		}
+		return new Gson().toJson(list);
 	}
 	
+	public static void main(String...args) {
+		try {
+			new PaymentIndexCrudDAO().getAutoSettlement("2019-03-20");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	
 	public String getDetail(String idxes_payment) throws Exception {

@@ -44,6 +44,18 @@ public class SettlementController {
 		
 	}
 	
+	@RequestMapping(value = "/"+MAPPINGNAME+"/getautolist.do", 
+			produces = "application/json; charset=utf-8")
+	public @ResponseBody String getTotalAutoList(
+			@RequestParam(value = "date", required = false) String date) throws Exception {
+		if(date == null) {
+			return new PaymentIndexCrudDAO().getAutoSettlement();
+		} else {
+			return new PaymentIndexCrudDAO().getAutoSettlement(date);
+		}
+		
+	}
+	
 	@ExceptionHandler
 	public @ResponseBody Status handle(Exception e, HttpServletResponse response) {
 		if(e.getClass().getSimpleName().equals("AccessDeniedException")) {

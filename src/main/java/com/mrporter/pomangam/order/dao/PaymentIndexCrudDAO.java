@@ -14,6 +14,7 @@ import com.google.gson.reflect.TypeToken;
 import com.mrporter.pomangam.common.pattern.dao.Crud;
 import com.mrporter.pomangam.common.util.Date;
 import com.mrporter.pomangam.order.vo.PaymentIndexBean;
+import com.mrporter.pomangam.order.vo.SettlementBean;
 
 /**
  * PaymentIndexCrudDAO
@@ -87,13 +88,31 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 					"pi.receive_date = ? and " +
 		 			"pi.idx = pay.idx_payment_index  and " +
 					"pay.idx_product = pro.idx and " +
-					"pay.idx_restaurant = res.idx and pi.status = (1|3) ORDER BY res_name", date);
-		
-		Gson gson = new Gson();
-		List<PaymentIndexBean> list = gson.fromJson(gson.toJson(lom), new TypeToken<List<PaymentIndexBean>>() {}.getType());
+					"pay.idx_restaurant = res.idx ORDER BY res_name", date);
 		
 		return new Gson().toJson(lom);
 	}
+	
+	public String getAutoSettlement(String date) throws Exception {
+		List<Map<String, Object>> lom 
+		= sqlQuery(
+				"SELECT " +
+					"res.name as res_name, pay.amount, pay.additional, pro.price, pro.c_commission_prc, pro.s_commission_prc " +
+				"FROM " +
+					"payment pay, product pro, restaurant res, payment_index pi " +
+				"WHERE " + 
+					"pi.receive_date = ? and " +
+		 			"pi.idx = pay.idx_payment_index  and " +
+					"pay.idx_product = pro.idx and " +
+					"pay.idx_restaurant = res.idx and pi.status = (1|3) ORDER BY res_name", date);
+		
+		Gson gson = new Gson();
+		List<SettlementBean> list = gson.fromJson(gson.toJson(lom), new TypeToken<List<SettlementBean>>() {}.getType());
+		
+		return new Gson().toJson(lom);
+	}
+	
+	
 	
 	public String getDetail(String idxes_payment) throws Exception {
 		if(idxes_payment==null || idxes_payment.length()==0) return "";

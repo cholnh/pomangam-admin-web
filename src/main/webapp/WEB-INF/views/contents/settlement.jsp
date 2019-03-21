@@ -188,9 +188,14 @@ function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-$(document).ready(function() {
+$('#table2').on('load-success.bs.table', function () {
 	$('#ob-gdate').val(new Date().format("yyyy-MM-dd"));
 	calTotal();
+});
+
+$(document).ready(function() {
+	
+	
 	// export event
 	$('#export').off('click').on('click', function(e) {
 		$('#table').bootstrapTable('togglePagination');

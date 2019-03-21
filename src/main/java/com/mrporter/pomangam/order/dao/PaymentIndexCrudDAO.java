@@ -110,7 +110,7 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 				        "AND pi.idx = pay.idx_payment_index " +
 				        "AND pay.idx_product = pro.idx " +
 				        "AND pay.idx_restaurant = res.idx " +
-				        "AND pi.status = (1 | 3) " +
+				        "AND pi.status IN (1, 3) " +
 				"GROUP BY res_name", date);
 		
 		if(lom==null||lom.isEmpty()) { 
@@ -137,7 +137,7 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 					        "AND pi.idx = pay.idx_payment_index " +
 					        "AND pay.idx_product = pro.idx " +
 					        "AND pay.idx_restaurant = res.idx " +
-					        "AND pi.status = (1 | 3) " +
+					        "AND pi.status IN (1, 3) " +
 					        "AND res.name = ?", date, res_name);
 			
 			int amountTotal = 0;

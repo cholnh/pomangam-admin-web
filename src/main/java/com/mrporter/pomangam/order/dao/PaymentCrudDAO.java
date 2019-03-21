@@ -55,6 +55,7 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			String idx_box = lom.get(0).get("idx_box")+"";
 			String receive_date = lom.get(0).get("receive_date")+"";
 			String receive_time = lom.get(0).get("receive_time")+"";
+			String phonenumber = lom.get(0).get("phonenumber")+"";
 			int approvalTime = Integer.parseInt(receive_time.replace("시", "")) - 1;
 			
 			List<Map<String, Object>> lom2 
@@ -102,6 +103,8 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 							(requirement.length()>0?"요청사항 : " + requirement + System.lineSeparator() : "") +
 							"------------------------" + System.lineSeparator();
 				}
+				
+				menu += "고객번호 : " + phonenumber;
 				
 				List<Map<String, Object>> lom4
 				= sqlQuery(

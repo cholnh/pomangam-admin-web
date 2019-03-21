@@ -84,8 +84,6 @@
 
 <script>
 
-$('#ob-gdate').val(new Date().format("yyyy-MM-dd"));
-
 function nameFormatter(value, row) {
 	return value + '(' + row.price + ')';
 }
@@ -191,6 +189,8 @@ function numberWithCommas(x) {
 }
 
 $(document).ready(function() {
+	$('#ob-gdate').val(new Date().format("yyyy-MM-dd"));
+	calTotal();
 	// export event
 	$('#export').off('click').on('click', function(e) {
 		$('#table').bootstrapTable('togglePagination');

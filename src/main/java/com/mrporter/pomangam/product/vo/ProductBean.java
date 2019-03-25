@@ -29,4 +29,5 @@ public class ProductBean {
 	String sub_description;
 	Integer c_commission_prc;
 	Integer s_commission_prc;
+	Integer discount_prc;
 }

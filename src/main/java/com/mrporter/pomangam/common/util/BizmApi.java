@@ -31,6 +31,10 @@ public class BizmApi {
         body.put("profile", profile);
         body.put("msg", msg);
         body.put("tmplId", tmplId);
+        body.put("msgSms", msg);
+        body.put("smsKind", "L");
+        body.put("smsSender", "01064784899");
+        
         return apiClientUtils.sendByPost(header, body, subUrl);
     }
 }

@@ -81,9 +81,11 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		List<Map<String, Object>> lom 
 		= sqlQuery(
 				"SELECT " +
-					"pay.idx, pi.idx as pi_idx, res.name as res_name, pay.amount, pay.additional, pro.name as pro_name, pro.price, pi.status, pi.cashreceipt, pro.c_commission_prc, pro.s_commission_prc " +
+					"pay.idx, pi.idx as pi_idx, res.name as res_name, pay.amount, pay.additional, pro.name as pro_name, pro.price, pi.status, pi.cashreceipt, pro.c_commission_prc, pro.s_commission_prc, cp.discount_prc " +
 				"FROM " +
 					"payment pay, product pro, restaurant res, payment_index pi " +
+				"LEFT JOIN coupon cp " +
+				"ON pi.cpno = cp.cpno " +
 				"WHERE " + 
 					"pi.receive_date = ? and " +
 		 			"pi.idx = pay.idx_payment_index  and " +

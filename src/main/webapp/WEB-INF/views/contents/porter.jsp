@@ -89,7 +89,6 @@
 				<col style="width:auto">
 				<col style="width:auto">
 				<col style="width:auto">
-				<col style="width:auto">
 				<col style="width:200px">
 				<col style="width:auto">
 				<col style="width:auto">
@@ -97,7 +96,7 @@
 				<col style="width:auto">
 				<col style="width:auto">
 				<col style="width:auto">
-				
+				<col style="width:auto">
 			</colgroup>
 			<textarea id="copyarea"></textarea>
 			<thead>
@@ -106,16 +105,17 @@
 					<th data-field="status" data-sortable="true" data-formatter="statusFormatter">주문상태</th>
 					<th data-field="idx_box" data-sortable="true" data-cell-style="boxStyle">bn</th>
 					<th data-field="idx" data-sortable="true">pn</th>
-					<th data-field="idxes_payment" data-sortable="true">개별번호</th>
+					<!-- <th data-field="idxes_payment" data-sortable="true">개별번호</th> -->
 					<th data-field="receive_date" data-sortable="true">받는날짜</th>
 					<th data-field="receive_time" data-sortable="true">받는시간</th>
 					<th data-field="where" data-sortable="true">음식받는곳</th>
 					<th data-field="member_name" data-sortable="true">이름</th>
 					<th data-field="phonenumber" data-sortable="true">핸드폰번호</th>
 					<th data-field="guestname" data-sortable="true">비회원이름</th>
-					<th data-field="totalprice" data-sortable="true">총가격</th>
+					<th data-field="totalprice" data-sortable="true">최종 가격</th>
 					<th data-field="password" data-sortable="true">비밀번호</th>
 					<th data-field="timestamp" data-sortable="true">주문생성시간</th>
+					<th data-field="cpno" data-sortable="true">쿠폰</th>
 				</tr>
 			</thead>
 		</table>

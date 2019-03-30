@@ -69,12 +69,12 @@
 					<th data-field="amount" data-sortable="true">수량</th>
 					<th data-field="additional" data-sortable="true">추가사항</th>
 					<th data-field="pro_name" data-sortable="true" data-formatter="nameFormatter">제품명</th>
-					<th data-field="price" data-sortable="true" data-formatter="priceFormatter">총 가격</th>
+					<th data-field="price" data-sortable="true" data-formatter="priceFormatter">가격</th>
 					<th data-field="status" data-sortable="true">처리상태</th>
 					<th data-field="cashreceipt" data-sortable="true">현금영수증</th>
 					<th data-field="c_commission_prc" data-sortable="true">고객수수료</th>
 					<th data-field="s_commission_prc" data-sortable="true">업체수수료</th>
-					
+					<th data-field="discount_prc" data-sortable="true">쿠폰할인가</th>
 				</tr>
 			</thead>
 		</table>
@@ -174,13 +174,35 @@ function calTotal() {
 		salesTotal += data.sales;
 		commissionTotal += data.commission;
 		purchaseTotal += data.purchase;
+		
 	}
-	$('#table2').bootstrapTable('insertRow', {index: last, row: {
+	
+	$('#table2').bootstrapTable('insertRow', {index: last+1, row: {
 		res_name : "<b style=\"color:red; font-size:18px;\">총 합</b>", 
 		amount : "<b style=\"color:red; font-size:18px;\">" + numberWithCommas(amountTotal) + "개</b>", 
 		sales : "<b style=\"color:red; font-size:18px;\">" + numberWithCommas(salesTotal) + "원</b>", 
 		commission : "<b style=\"color:red; font-size:18px;\">" + numberWithCommas(commissionTotal) + "원</b>", 
 		purchase : "<b style=\"color:red; font-size:18px;\">" + numberWithCommas(purchaseTotal) + "원</b>"
+	}});
+}
+
+function calCp() {
+	var datas = $('#table').bootstrapTable('getData');
+	var cpCount = 0;
+	var cpTotal = 0;
+	
+	for(var i=0; i<datas.length; i++) {
+		var data = datas[i];
+		if(data.discount_prc) {
+			cpCount += 1;
+			cpTotal += data.discount_prc;
+		}
+	}
+	
+	$('#table2').bootstrapTable('insertRow', {index: 0, row: {
+		res_name : "<b style=\"color:cyan; \">쿠폰</b>", 
+		amount : "<b style=\"color:cyan; \">" + numberWithCommas(cpCount) + "개</b>", 
+		purchase : "<b style=\"color:cyan; \">" + numberWithCommas(cpTotal) + "원</b>"
 	}});
 }
 
@@ -192,6 +214,11 @@ $('#table2').on('load-success.bs.table', function () {
 	$('#ob-gdate').val(new Date().format("yyyy-MM-dd"));
 	calTotal();
 });
+
+$('#table').on('load-success.bs.table', function () {
+	calCp();
+});
+
 
 $(document).ready(function() {
 	

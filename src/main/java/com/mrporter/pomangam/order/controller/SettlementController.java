@@ -44,6 +44,18 @@ public class SettlementController {
 		
 	}
 	
+	@RequestMapping(value = "/"+MAPPINGNAME+"/getcplist.do", 
+			produces = "application/json; charset=utf-8")
+	public @ResponseBody String getCpList(
+			@RequestParam(value = "date", required = false) String date) throws Exception {
+		if(date == null) {
+			return new PaymentIndexCrudDAO().getCpList();
+		} else {
+			return new PaymentIndexCrudDAO().getCpList(date);
+		}
+		
+	}
+	
 	@RequestMapping(value = "/"+MAPPINGNAME+"/getautolist.do", 
 			produces = "application/json; charset=utf-8")
 	public @ResponseBody String getTotalAutoList(

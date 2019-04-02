@@ -306,7 +306,36 @@
 										</div>
 								</label></td>
 							</tr>
-
+							
+							<tr>
+								<th rowspan="1" class="font-size-13 valign-middle">쿠폰 관리</th>
+								<td rowspan="1" class="valign-middle"><label
+									class="switcher switcher-rounded switcher-lg switcher-primary switcher-blank">
+										<input type="checkbox" id="menu_coupon" checked>
+										<div class="switcher-indicator">
+											<div class="switcher-yes">ON</div>
+											<div class="switcher-no">OFF</div>
+										</div>
+								</label></td>
+								<th class="font-size-13">쿠폰 발급</th>
+								<td><label
+									class="switcher switcher-rounded switcher-lg switcher-primary switcher-blank">
+										<input type="checkbox" id="menu11-1" checked>
+										<div class="switcher-indicator">
+											<div class="switcher-yes">ON</div>
+											<div class="switcher-no">OFF</div>
+										</div>
+								</label></td>
+								<td><label
+									class="switcher switcher-rounded switcher-lg switcher-primary switcher-blank">
+										<input type="checkbox" id="menu11-2" checked>
+										<div class="switcher-indicator">
+											<div class="switcher-yes">ON</div>
+											<div class="switcher-no">OFF</div>
+										</div>
+								</label></td>
+							</tr>
+							
 							<tr>
 								<td colspan="5" id="edit">
 									<button type="button" class="btn btn-lg btn-success btn-block" 
@@ -484,8 +513,8 @@
 	}
 	
 	function printAccess() {
-		var menu = ['menu_restaurant', 'menu_porter', 'menu_member', 'menu_target'];
-		var list = [[0,1,2], [3,4], [5,6,7,8], [9,10]];
+		var menu = ['menu_restaurant', 'menu_porter', 'menu_member', 'menu_target', 'menu_coupon'];
+		var list = [[0,1,2], [3,4], [5,6,7,8], [9,10], [11]];
 		for(var i=0; i<list.length; i++) {
 			var tf = true;
 			for(var j=0; j<list[i].length; j++) {
@@ -568,6 +597,18 @@ $(document).ready(function() {
 	$('#menu_target').change(function(e) {
 		var ischecked = e.currentTarget.checked;
 		var list = [9,10];
+		for(var i=0; i<list.length; i++) {
+			var id = 'menu'+list[i];
+			$('input:checkbox[id="'+id+'-1'+'"]').prop("checked", ischecked);
+			$('input:checkbox[id="'+id+'-2'+'"]').prop("checked", ischecked);
+			$('input:checkbox[id="'+id+'-1'+'"]').prop("disabled", !ischecked);
+			$('input:checkbox[id="'+id+'-2'+'"]').prop("disabled", !ischecked);
+		}
+	});
+	
+	$('#menu_coupon').change(function(e) {
+		var ischecked = e.currentTarget.checked;
+		var list = [11];
 		for(var i=0; i<list.length; i++) {
 			var id = 'menu'+list[i];
 			$('input:checkbox[id="'+id+'-1'+'"]').prop("checked", ischecked);

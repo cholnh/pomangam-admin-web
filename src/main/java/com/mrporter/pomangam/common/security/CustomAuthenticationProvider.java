@@ -56,7 +56,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     		PrivateKey privateKey = (PrivateKey) session.getAttribute("__rsaPrivateKey__");
     		String username = decryptRSA(privateKey, authentication.getName());
             String password = decryptRSA(privateKey, (String) authentication.getCredentials());
-            boolean isRemember = Boolean.parseBoolean(request.getParameter("remember"));
+            //boolean isRemember = Boolean.parseBoolean(request.getParameter("remember"));
             
             User user;
             Collection<? extends GrantedAuthority> authorities;
@@ -78,6 +78,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             user.setPassword("");
             session.setAttribute("user", new Gson().toJson(user));
             
+            /*
             if(isRemember) {
             	int amount = 60*60*24*7;	// 7days
             	Cookie cookie = new Cookie("loginCookie", session.getId());
@@ -92,6 +93,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 					e.printStackTrace();
 				};
             }
+            */
             
             return new UsernamePasswordAuthenticationToken(user, password, authorities);
     	} finally {

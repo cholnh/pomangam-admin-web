@@ -35,6 +35,7 @@
 	String[] ROLE_PORTER = {"ROLE_PORTER_VIEW", "ROLE_SETTLEMENT_VIEW"};
 	String[] ROLE_MEMBER = {"ROLE_MEMBER_VIEW","ROLE_OWNER_VIEW","ROLE_ADMIN_VIEW","ROLE_AUTHORITY_VIEW"};
 	String[] ROLE_TARGET = {"ROLE_TARGET_VIEW","ROLE_RESTAURANT_VIEW"};
+	String[] ROLE_COUPON = {"ROLE_COUPON_VIEW"};
 	
 	
 %>
@@ -128,6 +129,20 @@
 						class="px-nav-label">매장 설정</span></a></li>
 				<%} %>
 			</ul></li>
+		<%} %>
+		
+		<%if( (n = howManyMatch(ROLE_COUPON)) > 0) { %>
+		<li class="px-nav-item px-nav-dropdown"><a href="#"><i
+				class="px-nav-icon ion-closed-captioning"></i><span
+				class="px-nav-label">쿠폰관리<span 
+				class="label label-danger"><%=n %></span></span></a>
+			<ul class="px-nav-dropdown-menu">
+				<%if(hasRole(ROLE_COUPON[0])) {%>
+				<li class="px-nav-item"><a href="./coupon.do"><span
+						class="px-nav-label">쿠폰 발급</span></a></li>
+				<%} %>
+			</ul>
+		</li>
 		<%} %>
 		
 	</ul>

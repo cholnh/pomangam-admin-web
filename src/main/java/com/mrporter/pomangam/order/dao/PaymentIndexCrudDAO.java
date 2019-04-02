@@ -33,6 +33,24 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		super(TABLENAME);
 	}
 	
+	public String getCpList() throws Exception {
+		return getCpList(Date.getCurDay());
+	}
+	
+	public String getCpList(String date) throws Exception {
+		List<Map<String, Object>> lom 
+		= sqlQuery(
+				"SELECT " +
+						"pi.idx, cp.cpname, pi.cpno, cp.discount_prc, cp.use_username " +
+					"FROM " +
+						"payment_index pi, coupon cp " +
+					"WHERE " + 
+						"pi.receive_date = ? " +
+			 			"AND pi.cpno IS NOT NULL " +
+						"AND pi.cpno = cp.cpno ", date);
+		return new Gson().toJson(lom);
+	}
+	
 	public List<Integer> getOrderedRestaurant(String time) throws Exception {
 		
 		List<Map<String, Object>> lom 
@@ -81,16 +99,14 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		List<Map<String, Object>> lom 
 		= sqlQuery(
 				"SELECT " +
-					"pay.idx, pi.idx as pi_idx, res.name as res_name, pay.amount, pay.additional, pro.name as pro_name, pro.price, pi.status, pi.cashreceipt, pro.c_commission_prc, pro.s_commission_prc, cp.discount_prc " +
-				"FROM " +
-					"payment pay, product pro, restaurant res, payment_index pi " +
-				"LEFT JOIN coupon cp " +
-				"ON pi.cpno = cp.cpno " +
-				"WHERE " + 
-					"pi.receive_date = ? and " +
-		 			"pi.idx = pay.idx_payment_index  and " +
-					"pay.idx_product = pro.idx and " +
-					"pay.idx_restaurant = res.idx ORDER BY res_name", date);
+						"pay.idx, pi.idx as pi_idx, res.name as res_name, pay.amount, pay.additional, pro.name as pro_name, pro.price, pi.status, pi.cashreceipt, pro.c_commission_prc, pro.s_commission_prc, pi.cpno AS cpno " +
+					"FROM " +
+						"payment pay, product pro, restaurant res, payment_index pi " +
+					"WHERE " + 
+						"pi.receive_date = ? and " +
+			 			"pi.idx = pay.idx_payment_index  and " +
+						"pay.idx_product = pro.idx and " +
+						"pay.idx_restaurant = res.idx ORDER BY res_name", date);
 		
 		return new Gson().toJson(lom);
 	}

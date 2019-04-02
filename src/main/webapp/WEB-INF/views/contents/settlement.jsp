@@ -44,6 +44,25 @@
 				</tr>
 			</thead>
 		</table>
+		
+		<hr style="margin-top:64px;margin-bottom:32px">
+		<table id="cptable" data-toggle="table" data-show-refresh="true"
+			data-mobile-responsive="true" style="background-color: white; -webkit-overflow-scrolling:touch;"
+			data-search="true"
+			data-url="./settlement/getcplist.do">
+			<thead>
+				<tr>
+					<th data-field="" data-checkbox="true"></th>
+					<th data-field="idx" data-sortable="true">주문번호</th>
+					<th data-field="cpname" data-sortable="true">쿠폰이름</th>
+					<th data-field="cpno" data-sortable="true">쿠폰번호</th>
+					<th data-field="discount_prc" data-sortable="true">할인가격</th>
+					<th data-field="use_username" data-sortable="true">사용자</th>
+					
+				</tr>
+			</thead>
+		</table>
+		
 		<hr style="margin-top:64px;margin-bottom:32px">
 		<div class="table-title" style="background-color: #f5f5f5; ">
 			<div class="row">
@@ -74,7 +93,7 @@
 					<th data-field="cashreceipt" data-sortable="true">현금영수증</th>
 					<th data-field="c_commission_prc" data-sortable="true">고객수수료</th>
 					<th data-field="s_commission_prc" data-sortable="true">업체수수료</th>
-					<th data-field="discount_prc" data-sortable="true">쿠폰할인가</th>
+					<th data-field="cpno" data-sortable="true">쿠폰</th>
 				</tr>
 			</thead>
 		</table>
@@ -104,8 +123,10 @@ function priceFormatter(value, row) {
 $('#load').on('click', function(e) {
 	$('#table').bootstrapTable('removeAll');
 	$('#table2').bootstrapTable('removeAll');
+	$('#cptable').bootstrapTable('removeAll');
 	$('#table').bootstrapTable('showLoading');
 	$('#table2').bootstrapTable('showLoading');
+	$('#cptable').bootstrapTable('showLoading');
 	
 	var $this = $('#ob-gdate');
 	
@@ -114,18 +135,42 @@ $('#load').on('click', function(e) {
 	} else if($this.val().length == 10) {
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");	
+		
+		$.ajax({
+			type : "POST",
+			url : './settlement/getcplist.do',
+			data : {
+				date : $this.val()
+			},
+			
+			beforeSend : function(request) {
+				request.setRequestHeader(header, token);
+			},
+			success : function(data) {
+				$('#cptable').bootstrapTable('load', data);
+				$('#cptable').bootstrapTable('hideLoading');
+				calCp();
+			},
+			error : function(msg) {
+				alert('ajax error' + msg);
+				$('#cptable').bootstrapTable('hideLoading');
+			}
+		});
+		
 		$.ajax({
 			type : "POST",
 			url : './settlement/getlist.do',
 			data : {
 				date : $this.val()
 			},
+			
 			beforeSend : function(request) {
 				request.setRequestHeader(header, token);
 			},
 			success : function(data) {
 				$('#table').bootstrapTable('load', data);
 				$('#table').bootstrapTable('hideLoading');
+				
 				//alert('데이터 로드 완료');
 				//$('#ob-gdate').val('');
 			},
@@ -148,6 +193,7 @@ $('#load').on('click', function(e) {
 				$('#table2').bootstrapTable('load', data);
 				$('#table2').bootstrapTable('hideLoading');
 				calTotal();
+				
 				//alert('데이터 로드 완료');
 				//$('#ob-gdate').val('');
 			},
@@ -177,6 +223,8 @@ function calTotal() {
 		
 	}
 	
+	calCp(last);
+	
 	$('#table2').bootstrapTable('insertRow', {index: last+1, row: {
 		res_name : "<b style=\"color:red; font-size:18px;\">총 합</b>", 
 		amount : "<b style=\"color:red; font-size:18px;\">" + numberWithCommas(amountTotal) + "개</b>", 
@@ -186,11 +234,11 @@ function calTotal() {
 	}});
 }
 
-function calCp() {
-	var datas = $('#table').bootstrapTable('getData');
+function calCp(last) {
+	var datas = $('#cptable').bootstrapTable('getData');
 	var cpCount = 0;
 	var cpTotal = 0;
-	
+	console.log(datas);
 	for(var i=0; i<datas.length; i++) {
 		var data = datas[i];
 		if(data.discount_prc) {
@@ -199,7 +247,7 @@ function calCp() {
 		}
 	}
 	
-	$('#table2').bootstrapTable('insertRow', {index: 0, row: {
+	$('#table2').bootstrapTable('insertRow', {index: last, row: {
 		res_name : "<b style=\"color:cyan; \">쿠폰</b>", 
 		amount : "<b style=\"color:cyan; \">" + numberWithCommas(cpCount) + "개</b>", 
 		purchase : "<b style=\"color:cyan; \">" + numberWithCommas(cpTotal) + "원</b>"
@@ -214,11 +262,6 @@ $('#table2').on('load-success.bs.table', function () {
 	$('#ob-gdate').val(new Date().format("yyyy-MM-dd"));
 	calTotal();
 });
-
-$('#table').on('load-success.bs.table', function () {
-	calCp();
-});
-
 
 $(document).ready(function() {
 	

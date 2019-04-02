@@ -46,7 +46,7 @@
 					
 					<div class="etc-login-form">
 						<center>
-						로그인 상태 유지
+						아이디 기억
 						<label class="switcher switcher-rounded switcher-lg switcher-primary switcher-blank">
 							<input type="checkbox" id="ob-remember" value="1" checked>
 							<div class="switcher-indicator">
@@ -70,7 +70,7 @@
         <form id="securedLoginForm" name="securedLoginForm" action="./j_spring_security_check" method="post" style="display: none;">
             <input type="hidden" name="securedUsername" id="securedUsername" value="" />
             <input type="hidden" name="securedPassword" id="securedPassword" value="" />
-            <input type="hidden" name="remember" id="remember" value="" />
+            <!-- <input type="hidden" name="remember" id="remember" value="" /> -->
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </form>
 	</center>

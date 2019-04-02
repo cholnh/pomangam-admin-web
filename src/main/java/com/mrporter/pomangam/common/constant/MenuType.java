@@ -28,8 +28,8 @@ public enum MenuType {
 	ADMIN(7),	
 	AUTHORITY(8),
 	TARGET(9),
-	RESTAURANT(10); 
-	
+	RESTAURANT(10),
+	COUPON(11);
 
 	private Integer dbValue;
 	

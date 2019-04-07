@@ -56,13 +56,15 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			String receive_date = lom.get(0).get("receive_date")+"";
 			String receive_time = lom.get(0).get("receive_time")+"";
 			String phonenumber = lom.get(0).get("phonenumber")+"";
+			String where = lom.get(0).get("where")+"";
+			where = where.equals("기숙사 식당 (도착시간 +10분)") ? "ㄱ" : "ㅎ";
 			int approvalTime = Integer.parseInt(receive_time.replace("시", "")) - 1;
 			
 			List<Map<String, Object>> lom2 
 			= sqlQuery(
 					"SELECT idx_restaurant FROM payment WHERE idx_payment_index = ? group by idx_restaurant;", paymentIndex);
 			
-			String text = 	"주문번호 : " + idx_box + " (no." + paymentIndex + ")" + System.lineSeparator() +
+			String text = 	"주문번호 : " + where + "-" + idx_box + " (no." + paymentIndex + ")" + System.lineSeparator() +
 					"배달시간 : " + receive_date + " (" + receive_time + " 00분)" + System.lineSeparator() +
 					"※ " + approvalTime + "시 40~45분에 방문 예정 ※" + System.lineSeparator() +
 					"------------------------" + System.lineSeparator();

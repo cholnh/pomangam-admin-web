@@ -93,10 +93,6 @@ public class PorterController {
 			@RequestParam(value = "delay_reason", required = false) String delay_reason,
 			@RequestParam(value = "receive_time", required = false) String receive_time,
 			@RequestParam(value = "where", required = false) String where) throws Exception {
-		System.out.println("delay_min : " + delay_min);
-		System.out.println("delay_reason : " + delay_reason);
-		System.out.println("receive_time : " + receive_time);
-		System.out.println("where : " + where);
 		PaymentCrudDAO payDAO = new PaymentCrudDAO();
 		payDAO.sendDeliveryDelay(delay_min, delay_reason, receive_time, where.equals("")?null:where);
 	}

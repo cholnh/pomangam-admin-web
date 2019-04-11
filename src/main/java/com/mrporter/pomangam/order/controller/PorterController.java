@@ -77,6 +77,30 @@ public class PorterController {
 		
 	}
 	
+	@RequestMapping(value = "/"+MAPPINGNAME+"/deliveryarrive.do", 
+			produces = "application/json; charset=utf-8")
+	public @ResponseBody void deliveryArrive(
+			@RequestParam(value = "receive_time", required = false) String receive_time,
+			@RequestParam(value = "where", required = false) String where) throws Exception {
+		PaymentCrudDAO payDAO = new PaymentCrudDAO();
+		payDAO.sendDeliveryArrive(receive_time, where.equals("")?null:where);
+	}
+	
+	@RequestMapping(value = "/"+MAPPINGNAME+"/deliverydelay.do", 
+			produces = "application/json; charset=utf-8")
+	public @ResponseBody void deliveryDelay(
+			@RequestParam(value = "delay_min", required = false) int delay_min,
+			@RequestParam(value = "delay_reason", required = false) String delay_reason,
+			@RequestParam(value = "receive_time", required = false) String receive_time,
+			@RequestParam(value = "where", required = false) String where) throws Exception {
+		System.out.println("delay_min : " + delay_min);
+		System.out.println("delay_reason : " + delay_reason);
+		System.out.println("receive_time : " + receive_time);
+		System.out.println("where : " + where);
+		PaymentCrudDAO payDAO = new PaymentCrudDAO();
+		payDAO.sendDeliveryDelay(delay_min, delay_reason, receive_time, where.equals("")?null:where);
+	}
+	
 	@RequestMapping(value = "/"+MAPPINGNAME+"/setcancel.do", 
 			produces = "application/json; charset=utf-8")
 	public @ResponseBody void setCancel(

@@ -57,6 +57,14 @@
 				<div class="col-sm-6">
 				</div>
 				<div class="col-sm-6">
+					<a class="btn btn-primary" id="deliveryarrive"><span>배달도착</span></a>
+					<a class="btn btn-primary" id="deliverydelay"><span>배달지연</span></a>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-6">
+				</div>
+				<div class="col-sm-6">
 					<!-- <a class="btn btn-info" id="export"><i
 						class="ion-android-download"></i> <span>내보내기</span></a> -->
 					<a class="btn btn-info" id="copypn"><span>번호복사</span></a>
@@ -175,6 +183,120 @@
 	</div>
 </div>
 
+<!-- Modal-arrive -->
+<div class="modal fade" id="arriveInfo" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h4 class="modal-title" id="myModalLabel">배달도착 알림 전송</h4>
+			</div>
+
+			<div class="modal-body">
+				<div class="form-group">
+					<label class="col-md-3 control-label">장소</label>
+					<div class="col-md-9">
+						<label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="" checked>
+			                <span class="custom-control-indicator"></span>
+			               	 전체
+			            </label>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="학생회관 뒤">
+			                <span class="custom-control-indicator"></span>
+			               	 학생회관 뒤
+			            </label>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="기숙사 식당 (도착시간 +10분)">
+			                <span class="custom-control-indicator"></span>
+							기숙사 식당
+			            </label>
+					</div>
+				</div>
+				<hr>
+				<div class="form-group">
+					<label class="col-md-3 control-label">시간</label>
+					<div class="col-md-9">
+						<select id="arrivesel">
+						</select>
+					</div>
+				</div>
+				<br><br>
+			</div>
+			
+			<div class="modal-footer">
+				<button onclick="arrive()" class="btn btn-primary">전 송</button>
+				<button type="button" class="btn" data-dismiss="modal">취 소</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal-delay -->
+<div class="modal fade" id="delayInfo" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">×</button>
+				<h4 class="modal-title" id="myModalLabel">배달지연 알림 전송</h4>
+			</div>
+
+			<div class="modal-body">
+				<div class="form-group">
+					<label class="col-md-3 control-label">장소</label>
+					<div class="col-md-9">
+						<label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="" checked>
+			                <span class="custom-control-indicator"></span>
+			               	 전체
+			            </label>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="학생회관 뒤">
+			                <span class="custom-control-indicator"></span>
+			               	 학생회관 뒤
+			            </label>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="기숙사 식당 (도착시간 +10분)">
+			                <span class="custom-control-indicator"></span>
+							기숙사 식당
+			            </label>
+					</div>
+				</div>
+				<br>
+				<div class="form-group">
+					<label class="col-md-3 control-label">시간</label>
+					<div class="col-md-9">
+						<select id="arrivesel2">
+						</select>
+					</div>
+				</div>
+				<br>
+				<hr>
+				<br>
+				<div class="form-group">
+					<label class="col-md-3 control-label">사유</label>
+					<div class="col-md-9">
+						<input type="text" id="delay_reason" placeholder="ex) 교통 혼잡">
+					</div>
+				</div>
+				<br>
+				<div class="form-group">
+					<label class="col-md-3 control-label">지연 시간 (분 단위)</label>
+					<div class="col-md-6">
+						<input type="number" id="delay_min" min=0 value=0>분
+					</div>
+				</div>
+				<br><br>
+			</div>
+			
+			<div class="modal-footer">
+				<button onclick="delay()" class="btn btn-primary">전 송</button>
+				<button type="button" class="btn" data-dismiss="modal">취 소</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script>
 //$('.fixed-table-body').css('height', 'auto'); 
 
@@ -196,6 +318,16 @@ time_list.forEach(function(e){
 	$('#query_time').append($('<option>', {
 	    text: e+'시',
 	    value: e,
+	    selected: tf
+	}));
+	$('#arrivesel').append($('<option>', {
+	    text: e+'시',
+	    value: e+'시',
+	    selected: tf
+	}));
+	$('#arrivesel2').append($('<option>', {
+	    text: e+'시',
+	    value: e+'시',
 	    selected: tf
 	}));
 });
@@ -830,6 +962,73 @@ $('#export').off('click').on('click', function(e) {
        });
 });
 
+$('#deliveryarrive').off('click').on('click', function(e) {
+	$('#arriveInfo').modal();
+});
+
+$('#deliverydelay').off('click').on('click', function(e) {
+	$('#delayInfo').modal();
+});
+
+function arrive() {
+	
+	var receive_time = $('#arrivesel').val();
+	var where = $(":input:radio[name=where]:checked").val();
+	
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
+	$.ajax({
+		type : "POST",
+		url : "./porter/deliveryarrive.do",
+		data : {
+			receive_time: receive_time,
+			where: where
+		},
+		beforeSend : function(request) {
+			request.setRequestHeader(header, token);
+		},
+		success : function(data) {
+			alert('전송완료');
+		},
+		error : function(msg) {
+			alert('ajax error' + msg);
+		}
+	});
+	
+	$('#arriveInfo').modal('hide');
+}
+
+function delay(delay_min, delay_reason, receive_time, where) {
+	var delay_min = $('#delay_min').val();
+	var delay_reason = $('#delay_reason').val();
+	var receive_time = $('#arrivesel2').val();
+	var where = $(":input:radio[name=where]:checked").val();
+	
+	var token = $("meta[name='_csrf']").attr("content");
+	var header = $("meta[name='_csrf_header']").attr("content");
+	$.ajax({
+		type : "POST",
+		url : './porter/deliverydelay.do',
+		data : {
+			delay_min: delay_min,
+			delay_reason: delay_reason,
+			receive_time: receive_time,
+			where: where
+		},
+		beforeSend : function(request) {
+			request.setRequestHeader(header, token);
+		},
+		success : function(data) {
+			alert('전송완료');
+		},
+		error : function(msg) {
+			alert('ajax error' + msg);
+		}
+	});
+	
+	$('#delayInfo').modal('hide');
+}
+
 // export event
 var isTotal = false;
 $('#total').off('click').on('click', function(e) {
@@ -861,7 +1060,6 @@ $('#total').off('click').on('click', function(e) {
 			alert('ajax error' + msg);
 		}
 	});
-	
 });
 	
 

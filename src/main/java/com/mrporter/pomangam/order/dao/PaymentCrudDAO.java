@@ -37,10 +37,12 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 	}
 	
 	public static void main(String...args) {
-		String ss = "[{\"code\":\"success\",\"data\":{\"phn\":\"821064784899\",\"msgid\":\"WEB20190307220042345903\",\"type\":\"AT\"},\"message\":\"K000\"}]";
-		Gson gson = new Gson();
-		List<ApiResultBean> bean = gson.fromJson(ss, new TypeToken<List<ApiResultBean>>() {}.getType());
-		System.out.println("bean : "+bean);
+		try {
+			//new PaymentCrudDAO().sendDeliveryArrive("17시", "기숙사 식당 (도착시간 +10분)");
+			new PaymentCrudDAO().sendDeliveryDelay(5, "똥싸느라", "17시", "기숙사 식당 (도착시간 +10분)");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void sendOrderMsg(int paymentIndex) throws Exception {
@@ -139,6 +141,123 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			
 		}
 	}
+	
+	public void sendDeliveryDelay(int delay_min, String delay_reason ,String receive_time, String where) throws Exception {
+		String tmplId = "pmg_delivery_delay_1";
+		List<Map<String, Object>> lom = null;
+		
+		if(where == null) {
+			lom = sqlQuery(
+					"SELECT " +
+							"    phonenumber, pi.where " +
+							"FROM " +
+							"    payment_index pi " +
+							"WHERE " +
+							"    receive_date = CURDATE() " +
+							"    AND receive_time = ? ", receive_time);
+		} else {
+			lom = sqlQuery(
+					"SELECT " +
+							"    phonenumber, pi.where " +
+							"FROM " +
+							"    payment_index pi " +
+							"WHERE " +
+							"    receive_date = CURDATE() " +
+							"    AND receive_time = ? " +
+							"    AND pi.where = ? ", receive_time, where);
+		}
+		
+		if(lom != null  && !lom.isEmpty()) {
+			
+			String info = 	"포만감의 소식은 플친에서 확인!" + System.lineSeparator() +
+							"■ 문의 : 플친 → [채팅하기]" + System.lineSeparator() +
+							"http://pf.kakao.com/_xlxbhlj\n";  			
+			
+			for(Map<String, Object> map : lom) {
+				int delay_total = 0;
+				if(where == null) {
+					if(!(map.get("where") + "").equals("학생회관 뒤")) {
+						delay_total += delay_min + 10;
+					}
+				} else {
+					if(!where.equals("학생회관 뒤")) {
+						delay_total += delay_min + 10;
+					}
+				}
+				String text = 	"[포만감 배달 지연 안내]" + System.lineSeparator() +
+								"배달 도착시간이 약 " + delay_min + "분 간 지연되어 안내드립니다." + System.lineSeparator() +
+									System.lineSeparator() +
+								"▷ 사유 : " + delay_reason + System.lineSeparator() +
+								"▷ 예상 도착 시간 : " + receive_time + " " + delay_total + "분" + System.lineSeparator() +
+									System.lineSeparator() +
+								"[안내문]" + System.lineSeparator() +
+								"■ " + info;
+				
+				String phonenumber = map.get("phonenumber") + "";
+				
+				Object obj = BizmApi.send(phonenumber, text, tmplId).getBody();
+				Gson gson = new Gson();
+				List<ApiResultBean> bean = gson.fromJson(obj+"", new TypeToken<List<ApiResultBean>>() {}.getType());
+				if(!bean.get(0).getCode().equals("success")) {
+					// fail
+				}
+			}
+		}
+    }
+	
+	
+	public void sendDeliveryArrive(String receive_time, String where) throws Exception {
+		String tmplId = "pmg_delivery_arrive_1";
+		List<Map<String, Object>> lom = null;
+		
+		if(where == null) {
+			lom = sqlQuery(
+					"SELECT " +
+							"    phonenumber, pi.where " +
+							"FROM " +
+							"    payment_index pi " +
+							"WHERE " +
+							"    receive_date = CURDATE() " +
+							"    AND receive_time = ? ", receive_time);
+		} else {
+			lom = sqlQuery(
+					"SELECT " +
+							"    phonenumber, pi.where " +
+							"FROM " +
+							"    payment_index pi " +
+							"WHERE " +
+							"    receive_date = CURDATE() " +
+							"    AND receive_time = ? " +
+							"    AND pi.where = ? ", receive_time, where);
+		}
+		
+		if(lom != null  && !lom.isEmpty()) {
+			
+			String info = 	"■ 포만감의 소식은 플친에서 확인!" + System.lineSeparator() +
+							"■ 문의 : 플친 → [채팅하기]" + System.lineSeparator() +
+							"http://pf.kakao.com/_xlxbhlj\n";  			
+			
+			for(Map<String, Object> map : lom) {
+				String w = (where==null?(map.get("where")+""):where);
+				if(w.contains("(")) {
+					w = w.substring(0, w.indexOf("("));
+				}
+				
+				String text = 	"[포만감 도착 안내]" + System.lineSeparator() +
+		    			"주문하신 음식이 '곧 도착' 합니다." + System.lineSeparator() +
+		    			"수령 장소 : " + w + System.lineSeparator() + System.lineSeparator();
+				
+				String phonenumber = map.get("phonenumber") + "";
+				
+				Object obj = BizmApi.send(phonenumber, text+info, tmplId).getBody();
+				Gson gson = new Gson();
+				List<ApiResultBean> bean = gson.fromJson(obj+"", new TypeToken<List<ApiResultBean>>() {}.getType());
+				if(!bean.get(0).getCode().equals("success")) {
+					// fail
+				}
+			}
+		}
+    }
 	
 	public void sendFailMsg(int paymentIndex, String orderStatus) throws Exception {
 		PaymentIndexCrudDAO indexDAO = new PaymentIndexCrudDAO();

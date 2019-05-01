@@ -40,7 +40,7 @@ public class IndexController {
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String openDefaultPage(HttpServletRequest request, 
 									HttpServletResponse response) {
-		logger.info("Welcome home!");
+		//logger.info("Welcome home!");
 		
 		HttpSession session = request.getSession();
 		Object obj = session.getAttribute("user");

@@ -39,7 +39,7 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 	public static void main(String...args) {
 		try {
 			//new PaymentCrudDAO().sendDeliveryArrive("17시", "기숙사 식당 (도착시간 +10분)");
-			new PaymentCrudDAO().sendDeliveryDelay(5, "똥싸느라", "17시", "기숙사 식당 (도착시간 +10분)");
+			// new PaymentCrudDAO().sendDeliveryDelay(10, "똥싸느라", "19시", "학생회관 뒤");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -59,7 +59,24 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			String receive_time = lom.get(0).get("receive_time")+"";
 			String phonenumber = lom.get(0).get("phonenumber")+"";
 			String where = lom.get(0).get("where")+"";
-			where = where.equals("기숙사 식당 (도착시간 +10분)") ? "ㄱ" : "ㅎ";
+			switch(where) {
+			case "학생회관 뒤":
+				where = "ㅎ";
+				break;
+			case "기숙사 식당 (도착시간 +10분)":
+				where = "ㄱ";
+				break;
+			case "아카데미홀":
+				where = "아";
+				break;
+			case "제2학생회관 (도착시간 +5분)":
+				where = "학";
+				break;
+			case "기숙사 정문 (도착시간 +10분)":
+				where = "기";
+				break;
+			}
+			//where = where.equals("") ? "ㄱ" : "ㅎ";
 			int approvalTime = Integer.parseInt(receive_time.replace("시", "")) - 1;
 			
 			List<Map<String, Object>> lom2 
@@ -142,29 +159,56 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 		}
 	}
 	
-	public void sendDeliveryDelay(int delay_min, String delay_reason ,String receive_time, String where) throws Exception {
+	public void sendDeliveryDelay(int delay_min, String delay_reason ,String receive_time, String where, String curTarget) throws Exception {
 		String tmplId = "pmg_delivery_delay_1";
 		List<Map<String, Object>> lom = null;
 		
 		if(where == null) {
-			lom = sqlQuery(
-					"SELECT " +
-							"    phonenumber, pi.where " +
-							"FROM " +
-							"    payment_index pi " +
-							"WHERE " +
-							"    receive_date = CURDATE() " +
-							"    AND receive_time = ? ", receive_time);
+			if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
+				lom = sqlQuery(
+						"SELECT " +
+								"    phonenumber, pi.where " +
+								"FROM " +
+								"    payment_index pi " +
+								"WHERE " +
+								"    receive_date = CURDATE() " +
+								"    AND receive_time = ? ", receive_time);
+			} else {
+				lom = sqlQuery(
+						"SELECT " +
+								"    phonenumber, pi.where " +
+								"FROM " +
+								"    payment_index pi " +
+								"WHERE " +
+								"    receive_date = CURDATE() " +
+								"    AND receive_time = ? AND idx_target = ? ", receive_time, curTarget);
+			}
+			
+			
 		} else {
-			lom = sqlQuery(
-					"SELECT " +
-							"    phonenumber, pi.where " +
-							"FROM " +
-							"    payment_index pi " +
-							"WHERE " +
-							"    receive_date = CURDATE() " +
-							"    AND receive_time = ? " +
-							"    AND pi.where = ? ", receive_time, where);
+			
+			if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
+				lom = sqlQuery(
+						"SELECT " +
+								"    phonenumber, pi.where " +
+								"FROM " +
+								"    payment_index pi " +
+								"WHERE " +
+								"    receive_date = CURDATE() " +
+								"    AND receive_time = ? " +
+								"    AND pi.where = ? ", receive_time, where);
+			} else {
+				lom = sqlQuery(
+						"SELECT " +
+								"    phonenumber, pi.where " +
+								"FROM " +
+								"    payment_index pi " +
+								"WHERE " +
+								"    receive_date = CURDATE() " +
+								"    AND receive_time = ? " +
+								"    AND pi.where = ? AND idx_target = ? ", receive_time, where, curTarget);
+			}
+			
 		}
 		
 		if(lom != null  && !lom.isEmpty()) {
@@ -175,12 +219,24 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			
 			for(Map<String, Object> map : lom) {
 				int delay_total = 0;
+				
 				if(where == null) {
-					if(!(map.get("where") + "").equals("학생회관 뒤")) {
+					// 전체 전송
+					String w = map.get("where") + "";
+					if(w.equals("학생회관 뒤") || w.equals("아카데미홀")) {
+						delay_total += delay_min;
+					} else if(w.equals("제2학생회관 (도착시간 +5분)")) {
+						delay_total += delay_min + 5;
+					} else {
 						delay_total += delay_min + 10;
 					}
 				} else {
-					if(!where.equals("학생회관 뒤")) {
+					// 특정 장소 만 전송
+					if(where.equals("학생회관 뒤") || where.equals("아카데미홀")) {
+						delay_total += delay_min;
+					} else if(where.equals("제2학생회관 (도착시간 +5분)")) {
+						delay_total += delay_min + 5;
+					} else {
 						delay_total += delay_min + 10;
 					}
 				}
@@ -194,7 +250,6 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 								"■ " + info;
 				
 				String phonenumber = map.get("phonenumber") + "";
-				
 				Object obj = BizmApi.send(phonenumber, text, tmplId).getBody();
 				Gson gson = new Gson();
 				List<ApiResultBean> bean = gson.fromJson(obj+"", new TypeToken<List<ApiResultBean>>() {}.getType());
@@ -206,29 +261,54 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
     }
 	
 	
-	public void sendDeliveryArrive(String receive_time, String where) throws Exception {
+	public void sendDeliveryArrive(String receive_time, String where, String curTarget) throws Exception {
 		String tmplId = "pmg_delivery_arrive_1";
 		List<Map<String, Object>> lom = null;
 		
 		if(where == null) {
-			lom = sqlQuery(
-					"SELECT " +
-							"    phonenumber, pi.where " +
-							"FROM " +
-							"    payment_index pi " +
-							"WHERE " +
-							"    receive_date = CURDATE() " +
-							"    AND receive_time = ? ", receive_time);
+			if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
+				lom = sqlQuery(
+						"SELECT " +
+								"    phonenumber, pi.where " +
+								"FROM " +
+								"    payment_index pi " +
+								"WHERE " +
+								"    receive_date = CURDATE() " +
+								"    AND receive_time = ? ", receive_time);
+			} else {
+				lom = sqlQuery(
+						"SELECT " +
+								"    phonenumber, pi.where " +
+								"FROM " +
+								"    payment_index pi " +
+								"WHERE " +
+								"    receive_date = CURDATE() " +
+								"    AND receive_time = ? AND idx_target = ? ", receive_time, curTarget);
+			}
+			
 		} else {
-			lom = sqlQuery(
-					"SELECT " +
-							"    phonenumber, pi.where " +
-							"FROM " +
-							"    payment_index pi " +
-							"WHERE " +
-							"    receive_date = CURDATE() " +
-							"    AND receive_time = ? " +
-							"    AND pi.where = ? ", receive_time, where);
+			if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
+				lom = sqlQuery(
+						"SELECT " +
+								"    phonenumber, pi.where " +
+								"FROM " +
+								"    payment_index pi " +
+								"WHERE " +
+								"    receive_date = CURDATE() " +
+								"    AND receive_time = ? " +
+								"    AND pi.where = ? ", receive_time, where);
+			} else {
+				lom = sqlQuery(
+						"SELECT " +
+								"    phonenumber, pi.where " +
+								"FROM " +
+								"    payment_index pi " +
+								"WHERE " +
+								"    receive_date = CURDATE() " +
+								"    AND receive_time = ? " +
+								"    AND pi.where = ? AND idx_target = ? ", receive_time, where, curTarget);
+			}
+			
 		}
 		
 		if(lom != null  && !lom.isEmpty()) {

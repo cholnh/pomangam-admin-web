@@ -2,6 +2,7 @@ package com.mrporter.pomangam.order.controller;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -35,11 +36,15 @@ public class SettlementController {
 	@RequestMapping(value = "/"+MAPPINGNAME+"/getlist.do", 
 			produces = "application/json; charset=utf-8")
 	public @ResponseBody String getTotalList(
+			HttpServletRequest request, 
 			@RequestParam(value = "date", required = false) String date) throws Exception {
+		
+		String curTarget = request.getSession().getAttribute("curTarget") == null ? null : request.getSession().getAttribute("curTarget")+"";
+		
 		if(date == null) {
-			return new PaymentIndexCrudDAO().getTodaySettlementList();
+			return new PaymentIndexCrudDAO().getTodaySettlementList(curTarget);
 		} else {
-			return new PaymentIndexCrudDAO().getTodaySettlementList(date);
+			return new PaymentIndexCrudDAO().getTodaySettlementList(date, curTarget);
 		}
 		
 	}
@@ -47,11 +52,15 @@ public class SettlementController {
 	@RequestMapping(value = "/"+MAPPINGNAME+"/getcplist.do", 
 			produces = "application/json; charset=utf-8")
 	public @ResponseBody String getCpList(
+			HttpServletRequest request, 
 			@RequestParam(value = "date", required = false) String date) throws Exception {
+		
+		String curTarget = request.getSession().getAttribute("curTarget") == null ? null : request.getSession().getAttribute("curTarget")+"";
+		
 		if(date == null) {
-			return new PaymentIndexCrudDAO().getCpList();
+			return new PaymentIndexCrudDAO().getCpList(curTarget);
 		} else {
-			return new PaymentIndexCrudDAO().getCpList(date);
+			return new PaymentIndexCrudDAO().getCpList(date, curTarget);
 		}
 		
 	}
@@ -59,11 +68,15 @@ public class SettlementController {
 	@RequestMapping(value = "/"+MAPPINGNAME+"/getautolist.do", 
 			produces = "application/json; charset=utf-8")
 	public @ResponseBody String getTotalAutoList(
+			HttpServletRequest request, 
 			@RequestParam(value = "date", required = false) String date) throws Exception {
+		
+		String curTarget = request.getSession().getAttribute("curTarget") == null ? null : request.getSession().getAttribute("curTarget")+"";
+		
 		if(date == null) {
-			return new PaymentIndexCrudDAO().getAutoSettlement();
+			return new PaymentIndexCrudDAO().getAutoSettlement(curTarget);
 		} else {
-			return new PaymentIndexCrudDAO().getAutoSettlement(date);
+			return new PaymentIndexCrudDAO().getAutoSettlement(date,curTarget);
 		}
 		
 	}

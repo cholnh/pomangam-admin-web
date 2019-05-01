@@ -41,6 +41,7 @@
 
 <link href="css/bootstrap-table.min.css" rel="stylesheet" type="text/css">
 
+<link href="css/chartist.min.css" rel="stylesheet" type="text/css">
 
 <!-- Pace.js -->
 <script src="pace/pace.min.js"></script>
@@ -67,6 +68,14 @@
 	<script src="js/common-crud.js"></script>
 	<script src="js/jquery.formautofill.min.js"></script>
 	<script src="js/common.js"></script>
+	<script src="js/chartist.min.js"></script>
+	
+	<script src="js/jquery.flot.js"></script>
+	<script src="js/jquery.flot.resize.js"></script>
+	<script src="js/jquery.flot.tooltip.js"></script>
+	<script src="js/jquery.flot.categories.js"></script>
+	<script src="js/jquery.flot.pie.js"></script>
+	
 	<script>
 		var user = <%=userjson%>;
 		

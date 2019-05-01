@@ -33,29 +33,48 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		super(TABLENAME);
 	}
 	
-	public String getCpList() throws Exception {
-		return getCpList(Date.getCurDay());
+	public String getCpList(String curTarget) throws Exception {
+		return getCpList(Date.getCurDay(), curTarget);
 	}
 	
-	public String getCpList(String date) throws Exception {
-		List<Map<String, Object>> lom 
-		= sqlQuery(
-				"SELECT " +
-						"pi.idx, cp.cpname, pi.cpno, cp.discount_prc, cp.use_username " +
-					"FROM " +
-						"payment_index pi, coupon cp " +
-					"WHERE " + 
-						"pi.receive_date = ? " +
-			 			"AND pi.cpno IS NOT NULL " +
-						"AND pi.cpno = cp.cpno ", date);
+	public String getCpList(String date, String curTarget) throws Exception {
+		List<Map<String, Object>> lom;
+		if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
+			lom = sqlQuery(
+					"SELECT " +
+							"pi.idx, cp.cpname, pi.cpno, cp.discount_prc, cp.use_username " +
+						"FROM " +
+							"payment_index pi, coupon cp " +
+						"WHERE " + 
+							"pi.receive_date = ? " +
+				 			"AND pi.cpno IS NOT NULL " +
+							"AND pi.cpno = cp.cpno ", date);
+		} else {
+			lom = sqlQuery(
+					"SELECT " +
+							"pi.idx, cp.cpname, pi.cpno, cp.discount_prc, cp.use_username " +
+						"FROM " +
+							"payment_index pi, coupon cp " +
+						"WHERE " + 
+							"pi.receive_date = ? " +
+				 			"AND pi.cpno IS NOT NULL " +
+							"AND pi.cpno = cp.cpno AND pi.idx_target = ? ", date, curTarget);
+		}
+		
 		return new Gson().toJson(lom);
 	}
 	
-	public List<Integer> getOrderedRestaurant(String time) throws Exception {
+	public List<Integer> getOrderedRestaurant(String time, String curTarget) throws Exception {
 		
-		List<Map<String, Object>> lom 
-		= sqlQuery(
-				"SELECT idxes_payment FROM payment_index WHERE receive_date = ? AND receive_time = ?", Date.getCurDay(), time+"시");
+		List<Map<String, Object>> lom;
+		if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
+			lom = sqlQuery(
+					"SELECT idxes_payment FROM payment_index WHERE receive_date = ? AND receive_time = ?", Date.getCurDay(), time+"시");
+		} else {
+			lom = sqlQuery(
+					"SELECT idxes_payment FROM payment_index WHERE receive_date = ? AND receive_time = ? AND idx_target = ? ", Date.getCurDay(), time+"시", curTarget);
+		}
+		
 		
 		List<Integer> result = new ArrayList<>();
 		Set<String> set = new HashSet<>();
@@ -91,45 +110,77 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		sqlUpdate("UPDATE payment_index SET status = ? WHERE idx = ?", status, idx);
 	}
 	
-	public String getTodaySettlementList() throws Exception {
-		return getTodaySettlementList(Date.getCurDay());
+	public String getTodaySettlementList(String curTarget) throws Exception {
+		return getTodaySettlementList(Date.getCurDay(), curTarget);
 	}
 	
-	public String getTodaySettlementList(String date) throws Exception {
-		List<Map<String, Object>> lom 
-		= sqlQuery(
-				"SELECT " +
-						"pay.idx, pi.idx as pi_idx, res.name as res_name, pay.amount, pay.additional, pro.name as pro_name, pro.price, pi.status, pi.cashreceipt, pro.c_commission_prc, pro.s_commission_prc, pi.cpno AS cpno " +
-					"FROM " +
-						"payment pay, product pro, restaurant res, payment_index pi " +
-					"WHERE " + 
-						"pi.receive_date = ? and " +
-			 			"pi.idx = pay.idx_payment_index  and " +
-						"pay.idx_product = pro.idx and " +
-						"pay.idx_restaurant = res.idx ORDER BY res_name", date);
+	public String getTodaySettlementList(String date, String curTarget) throws Exception {
+		List<Map<String, Object>> lom;
+		if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
+			lom = sqlQuery(
+					"SELECT " +
+							"pay.idx, pi.idx as pi_idx, res.name as res_name, pay.amount, pay.additional, pro.name as pro_name, pro.price, pi.status, pi.cashreceipt, pro.c_commission_prc, pro.s_commission_prc, pi.cpno AS cpno " +
+						"FROM " +
+							"payment pay, product pro, restaurant res, payment_index pi " +
+						"WHERE " + 
+							"pi.receive_date = ? and " +
+				 			"pi.idx = pay.idx_payment_index  and " +
+							"pay.idx_product = pro.idx and " +
+							"pay.idx_restaurant = res.idx ORDER BY res_name", date);
+		} else {
+			lom = sqlQuery(
+					"SELECT " +
+							"pay.idx, pi.idx as pi_idx, res.name as res_name, pay.amount, pay.additional, pro.name as pro_name, pro.price, pi.status, pi.cashreceipt, pro.c_commission_prc, pro.s_commission_prc, pi.cpno AS cpno " +
+						"FROM " +
+							"payment pay, product pro, restaurant res, payment_index pi " +
+						"WHERE " + 
+							"pi.receive_date = ? and " +
+				 			"pi.idx = pay.idx_payment_index  and " +
+							"pay.idx_product = pro.idx and " +
+							"pay.idx_restaurant = res.idx AND pi.idx_target = ? ORDER BY res_name", date, curTarget);
+		}
 		
 		return new Gson().toJson(lom);
 	}
 	
-	public String getAutoSettlement() throws Exception {
-		return getAutoSettlement(Date.getCurDay());
+	public String getAutoSettlement(String curTarget) throws Exception {
+		return getAutoSettlement(Date.getCurDay(), curTarget);
 	}
 	
-	public String getAutoSettlement(String date) throws Exception {
-		List<Map<String, Object>> lom 
-		= sqlQuery(
-				"SELECT " + 
-				    "res.name AS res_name, " +
-				    "SUM((pro.c_commission_prc + pro.s_commission_prc) * pay.amount) AS commission " +
-				"FROM " +
-				    "payment pay, product pro, restaurant res, payment_index pi " +
-				"WHERE " + 
-				    "pi.receive_date = ? " +
-				        "AND pi.idx = pay.idx_payment_index " +
-				        "AND pay.idx_product = pro.idx " +
-				        "AND pay.idx_restaurant = res.idx " +
-				        "AND pi.status IN (1, 3) " +
-				"GROUP BY res_name", date);
+	public String getAutoSettlement(String date, String curTarget) throws Exception {
+		List<Map<String, Object>> lom;
+		if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
+			lom 
+			= sqlQuery(
+					"SELECT " + 
+					    "res.name AS res_name, " +
+					    "SUM((pro.c_commission_prc + pro.s_commission_prc) * pay.amount) AS commission " +
+					"FROM " +
+					    "payment pay, product pro, restaurant res, payment_index pi " +
+					"WHERE " + 
+					    "pi.receive_date = ? " +
+					        "AND pi.idx = pay.idx_payment_index " +
+					        "AND pay.idx_product = pro.idx " +
+					        "AND pay.idx_restaurant = res.idx " +
+					        "AND pi.status IN (1, 3) " +
+					"GROUP BY res_name", date);
+		} else {
+			lom 
+			= sqlQuery(
+					"SELECT " + 
+					    "res.name AS res_name, " +
+					    "SUM((pro.c_commission_prc + pro.s_commission_prc) * pay.amount) AS commission " +
+					"FROM " +
+					    "payment pay, product pro, restaurant res, payment_index pi " +
+					"WHERE " + 
+					    "pi.receive_date = ? " +
+					        "AND pi.idx = pay.idx_payment_index " +
+					        "AND pay.idx_product = pro.idx " +
+					        "AND pay.idx_restaurant = res.idx " +
+					        "AND pi.status IN (1, 3) " +
+					        "AND pi.idx_target = ? " +
+					"GROUP BY res_name", date, curTarget);
+		}
 		
 		if(lom==null||lom.isEmpty()) { 
 			return null; 
@@ -227,12 +278,19 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		return list;
 	}
 	
-	public String getTodayJsonWithTimeAndRes(String time, String res) throws Exception {
+	public String getTodayJsonWithTimeAndRes(String time, String res, String curTarget) throws Exception {
 		List<Map<String, Object>> result = new ArrayList<>();
 		
-		List<Map<String, Object>> lom 
-		= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND receive_time = ? order by receive_time desc, idx_box desc;",
-				Date.getCurDay(), time+"시");
+		List<Map<String, Object>> lom;
+		if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
+			lom 
+			= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND receive_time = ? order by receive_time desc, idx_box desc;",
+					Date.getCurDay(), time+"시");
+		} else {
+			lom 
+			= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND receive_time = ? AND idx_target = ? order by receive_time desc, idx_box desc;",
+					Date.getCurDay(), time+"시", curTarget);
+		}
 
 		if(lom!=null && !lom.isEmpty()) {
 			
@@ -259,26 +317,47 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		Gson gson = new Gson();
 		return gson.toJson(result);
 	}
-	public String getTodayJsonWithTime(String time) throws Exception {
-		List<Map<String, Object>> lom 
-		= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND receive_time = ? order by receive_time desc, idx_box desc;",
-				Date.getCurDay(), time+"시");
+	public String getTodayJsonWithTime(String time, String curTarget) throws Exception {
+		List<Map<String, Object>> lom;
+		if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
+			lom 
+			= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND receive_time = ? order by receive_time desc, idx_box desc;",
+					Date.getCurDay(), time+"시");
+		} else {
+			lom 
+			= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND receive_time = ? AND idx_target = ? order by receive_time desc, idx_box desc;",
+					Date.getCurDay(), time+"시", curTarget);
+		}
+		
 		Gson gson = new Gson();
 		return gson.toJson(lom);
 	}
 
-	public String getTodayJson() throws Exception {
-		List<Map<String, Object>> lom 
-		= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? order by receive_time desc, idx_box desc;",
-		//= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? order by idx desc;",
-				Date.getCurDay());
+	public String getTodayJson(String curTarget) throws Exception {
+		List<Map<String, Object>> lom;
+		if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
+			lom 
+			= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? order by receive_time desc, idx_box desc;",
+					Date.getCurDay());
+		} else {
+			lom 
+			= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND idx_target = ? order by receive_time desc, idx_box desc;",
+			//= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? order by idx desc;",
+					Date.getCurDay(), curTarget);
+		}
+		
 		Gson gson = new Gson();
 		return gson.toJson(lom);
 	}
 	
-	public String getTotalJson() throws Exception {
-		List<Map<String, Object>> lom 
-		= sqlQuery("SELECT * FROM payment_index order by idx desc;");
+	public String getTotalJson(String curTarget) throws Exception {
+		List<Map<String, Object>> lom;
+		if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
+			lom = sqlQuery("SELECT * FROM payment_index order by idx desc;");
+		} else {
+			lom = sqlQuery("SELECT * FROM payment_index WHERE idx_target = ? order by idx desc;", curTarget);
+		}
+		
 		Gson gson = new Gson();
 		return gson.toJson(lom);
 	}

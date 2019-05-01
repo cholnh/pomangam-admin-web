@@ -9,6 +9,8 @@
 	String paramtime = request.getParameter("time");
 	String paramres = request.getParameter("res");
 
+	String curTarget = session.getAttribute("curTarget") == null ? "0" : session.getAttribute("curTarget")+"";
+	
 	@SuppressWarnings({"unchecked"})
 	List<Integer> orderedRestaurantList = (List<Integer>) request.getAttribute("orderedRestaurantList");
 	@SuppressWarnings({"unchecked"})
@@ -47,9 +49,24 @@
 					<option value="-1">전체</option>
 				</select>
 				<select id="query_loc">
-					<option value="-1">전체</option>
-					<option value="1">학생회관 뒤</option>
-					<option value="2">기숙사 식당</option>
+					<%if(curTarget.equals("0")) { %>
+						<option value="-1">전체</option>
+						<option value="1">학생회관 뒤</option>
+						<option value="2">기숙사 식당</option>
+						<option value="3">아카데미홀</option>
+						<option value="4">제2학생회관</option> 
+						<option value="5">기숙사 정문</option>
+					<%} else if(curTarget.equals("1")) {%>
+						<option value="-1">전체</option>
+						<option value="1">학생회관 뒤</option>
+						<option value="2">기숙사 식당</option>
+					<%} else if(curTarget.equals("2")) {%>
+						<option value="-1">전체</option>
+						<option value="1">아카데미홀</option>
+						<option value="2">제2학생회관</option>
+						<option value="3">기숙사 정문</option>
+					<%} %>
+					
 				</select>
 			</div>
 			<br>
@@ -201,6 +218,8 @@
 			                <span class="custom-control-indicator"></span>
 			               	 전체
 			            </label>
+			            
+			            <%if(curTarget.equals("1")) { %>
 			            <label class="custom-control custom-checkbox checkbox-inline">
 			                <input type="radio" name="where" class="custom-control-input" value="학생회관 뒤">
 			                <span class="custom-control-indicator"></span>
@@ -211,6 +230,24 @@
 			                <span class="custom-control-indicator"></span>
 							기숙사 식당
 			            </label>
+			            <%} else if(curTarget.equals("2")) { %>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="아카데미홀">
+			                <span class="custom-control-indicator"></span>
+			               	 아카데미홀
+			            </label>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="제2학생회관 (도착시간 +5분)">
+			                <span class="custom-control-indicator"></span>
+							제2학생회관
+			            </label>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="기숙사 정문 (도착시간 +10분)">
+			                <span class="custom-control-indicator"></span>
+							기숙사 정문
+			            </label>
+			            <%} %>
+			            
 					</div>
 				</div>
 				<hr>
@@ -250,6 +287,8 @@
 			                <span class="custom-control-indicator"></span>
 			               	 전체
 			            </label>
+			            
+			            <%if(curTarget.equals("1")) { %>
 			            <label class="custom-control custom-checkbox checkbox-inline">
 			                <input type="radio" name="where" class="custom-control-input" value="학생회관 뒤">
 			                <span class="custom-control-indicator"></span>
@@ -260,6 +299,24 @@
 			                <span class="custom-control-indicator"></span>
 							기숙사 식당
 			            </label>
+			            <%} else if(curTarget.equals("2")) { %>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="아카데미홀">
+			                <span class="custom-control-indicator"></span>
+			               	 아카데미홀
+			            </label>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="제2학생회관 (도착시간 +5분)">
+			                <span class="custom-control-indicator"></span>
+							제2학생회관
+			            </label>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="기숙사 정문 (도착시간 +10분)">
+			                <span class="custom-control-indicator"></span>
+							기숙사 정문
+			            </label>
+			            <%} %>
+			            
 					</div>
 				</div>
 				<br>
@@ -303,6 +360,7 @@
 var targetList = ${targetList};
 var restaurantList = ${restaurantList};
 var productList = ${productList};
+var curTarget = ${curTarget==null?"0":curTarget};
 
 //var additionalList = ${additionalList};
 $('#test').hide();
@@ -344,16 +402,54 @@ $('#query_time').change(function() {
 $('#query_loc').change(function() {
 	var loc = $(this).val();
 	$('#table').bootstrapTable('filterBy');
-	if(loc == 1) {
-		$('#table').bootstrapTable('filterBy', {
-		    where : ['학생회관 뒤']
-		});
-	} else if(loc == 2) {
-		$('#table').bootstrapTable('filterBy', {
-		    where : ['기숙사 식당 (도착시간 +10분)']
-		});
-	}
 	
+	if(curTarget == 0) {
+		if(loc == 1) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['학생회관 뒤']
+			});
+		} else if(loc == 2) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['기숙사 식당 (도착시간 +10분)']
+			});
+		} else if(loc == 3) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['아카데미홀']
+			});
+		} else if(loc == 4) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['제2학생회관 (도착시간 +5분)']
+			});
+		} else if(loc == 5) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['기숙사 정문 (도착시간 +10분)']
+			});
+		}
+	} else if(curTarget == 1) {
+		if(loc == 1) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['학생회관 뒤']
+			});
+		} else if(loc == 2) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['기숙사 식당 (도착시간 +10분)']
+			});
+		}
+	} else if(curTarget == 2) {
+		if(loc == 1) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['아카데미홀']
+			});
+		} else if(loc == 2) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['제2학생회관 (도착시간 +5분)']
+			});
+		} else if(loc == 3) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['기숙사 정문 (도착시간 +10분)']
+			});
+		}
+	}
 });
 
 $('#query_restaurant').change(function() {
@@ -963,10 +1059,18 @@ $('#export').off('click').on('click', function(e) {
 });
 
 $('#deliveryarrive').off('click').on('click', function(e) {
+	if(curTarget == 0) {
+		alert('전체 모드에서는 사용할 수 없습니다.\n오른쪽 위 메뉴에서 학교를 선택해 주세요.');
+		return;
+	}
 	$('#arriveInfo').modal();
 });
 
 $('#deliverydelay').off('click').on('click', function(e) {
+	if(curTarget == 0) {
+		alert('전체 모드에서는 사용할 수 없습니다.\n오른쪽 위 메뉴에서 학교를 선택해 주세요.');
+		return;
+	}
 	$('#delayInfo').modal();
 });
 

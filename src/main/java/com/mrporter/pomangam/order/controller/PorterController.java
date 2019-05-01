@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +32,30 @@ public class PorterController {
 	private static final Logger logger = LoggerFactory.getLogger(PorterController.class);
 	private static final String MAPPINGNAME = "porter";
 	
+	@RequestMapping(value = "/session/setItem.do")
+	public void sessionSetItem(
+			HttpServletRequest request, 
+			HttpServletResponse response,
+			@RequestParam(value = "key", required = false) String key,
+			@RequestParam(value = "value", required = false) String value,
+			@RequestParam(value = "retUrl", required = false) String retUrl) throws Exception {
+		if(retUrl == null || retUrl.isEmpty()) {
+			retUrl = "/admin";
+		}
+		
+		HttpSession session = request.getSession();
+		session.setAttribute(key, value);
+		response.sendRedirect(retUrl);
+	}
+	
 	@RequestMapping(value = "/"+MAPPINGNAME+".do")
 	public ModelAndView openIndexPage(
 			HttpServletRequest request, 
 			HttpServletResponse response,
 			@RequestParam(value = "time", required = false) String time) throws Exception {
-
+		
+		String curTarget = request.getSession().getAttribute("curTarget") == null ? null : request.getSession().getAttribute("curTarget")+"";
+		
 		//PaymentIndexCrudDAO indexDAO = new PaymentIndexCrudDAO();
 		ModelAndView model = new ModelAndView();
 		model.setViewName("contents/" + MAPPINGNAME);
@@ -48,7 +67,7 @@ public class PorterController {
 		//model.addObject("additionalList", new ProductCrudDAO().getAdditionalCompactList());
 		
 		if(time != null && time.length() > 0) {
-			model.addObject("orderedRestaurantList", new PaymentIndexCrudDAO().getOrderedRestaurant(time));
+			model.addObject("orderedRestaurantList", new PaymentIndexCrudDAO().getOrderedRestaurant(time, curTarget));
 		}
 		
 		return model;
@@ -80,21 +99,27 @@ public class PorterController {
 	@RequestMapping(value = "/"+MAPPINGNAME+"/deliveryarrive.do", 
 			produces = "application/json; charset=utf-8")
 	public @ResponseBody void deliveryArrive(
+			HttpServletRequest request, 
 			@RequestParam(value = "receive_time", required = false) String receive_time,
 			@RequestParam(value = "where", required = false) String where) throws Exception {
+		
+		String curTarget = request.getSession().getAttribute("curTarget") == null ? null : request.getSession().getAttribute("curTarget")+"";
+		
 		PaymentCrudDAO payDAO = new PaymentCrudDAO();
-		payDAO.sendDeliveryArrive(receive_time, where.equals("")?null:where);
+		payDAO.sendDeliveryArrive(receive_time, where.equals("")?null:where, curTarget);
 	}
 	
 	@RequestMapping(value = "/"+MAPPINGNAME+"/deliverydelay.do", 
 			produces = "application/json; charset=utf-8")
 	public @ResponseBody void deliveryDelay(
+			HttpServletRequest request, 
 			@RequestParam(value = "delay_min", required = false) int delay_min,
 			@RequestParam(value = "delay_reason", required = false) String delay_reason,
 			@RequestParam(value = "receive_time", required = false) String receive_time,
 			@RequestParam(value = "where", required = false) String where) throws Exception {
+		String curTarget = request.getSession().getAttribute("curTarget") == null ? null : request.getSession().getAttribute("curTarget")+"";
 		PaymentCrudDAO payDAO = new PaymentCrudDAO();
-		payDAO.sendDeliveryDelay(delay_min, delay_reason, receive_time, where.equals("")?null:where);
+		payDAO.sendDeliveryDelay(delay_min, delay_reason, receive_time, where.equals("")?null:where, curTarget);
 	}
 	
 	@RequestMapping(value = "/"+MAPPINGNAME+"/setcancel.do", 
@@ -202,24 +227,29 @@ public class PorterController {
 	@RequestMapping(value = "/"+MAPPINGNAME+"/gettotaylist.do", 
 			produces = "application/json; charset=utf-8")
 	public @ResponseBody String getTodayList(
+			HttpServletRequest request, 
 			@RequestParam(value = "time", required = false) String time,
 			@RequestParam(value = "res", required = false) String res) throws Exception {
 		
+		String curTarget = request.getSession().getAttribute("curTarget") == null ? null : request.getSession().getAttribute("curTarget")+"";
+		
 		if(time != null && res != null) {
-			return new PaymentIndexCrudDAO().getTodayJsonWithTimeAndRes(time, res);
+			return new PaymentIndexCrudDAO().getTodayJsonWithTimeAndRes(time, res, curTarget);
 		}
 		if(time != null) {
-			return new PaymentIndexCrudDAO().getTodayJsonWithTime(time);
+			return new PaymentIndexCrudDAO().getTodayJsonWithTime(time, curTarget);
 		}
 
-		return new PaymentIndexCrudDAO().getTodayJson();
+		return new PaymentIndexCrudDAO().getTodayJson(curTarget);
 	}
 	
 	@RequestMapping(value = "/"+MAPPINGNAME+"/gettotallist.do", 
 			produces = "application/json; charset=utf-8")
-	public @ResponseBody String getTotalList() throws Exception {
+	public @ResponseBody String getTotalList(HttpServletRequest request) throws Exception {
 		
-		return new PaymentIndexCrudDAO().getTotalJson();
+		String curTarget = request.getSession().getAttribute("curTarget") == null ? null : request.getSession().getAttribute("curTarget")+"";
+		
+		return new PaymentIndexCrudDAO().getTotalJson(curTarget);
 	}
 	
 	@ExceptionHandler

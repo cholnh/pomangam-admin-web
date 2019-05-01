@@ -78,6 +78,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             user.setPassword("");
             session.setAttribute("user", new Gson().toJson(user));
             
+            session.setAttribute("curTarget", user.getCurTarget() == null ? "0" : user.getCurTarget());
+            
             /*
             if(isRemember) {
             	int amount = 60*60*24*7;	// 7days

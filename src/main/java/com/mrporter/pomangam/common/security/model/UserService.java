@@ -33,6 +33,7 @@ public class UserService implements UserDetailsService {
         	user.setUsername(adminBean.getUsername());
         	user.setPassword(adminBean.getPassword());
         	user.setNickname(adminBean.getNickname());
+        	user.setCurTarget(adminBean.getIdx_target());
         	
         	List<Role> roles = new ArrayList<Role>();
         	Map<Integer, String> menumap = MenuType.getIdxMap();

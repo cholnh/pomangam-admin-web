@@ -66,14 +66,14 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			case "기숙사 식당 (도착시간 +10분)":
 				where = "ㄱ";
 				break;
-			case "아카데미홀":
-				where = "아";
+			case "기숙사 정문":
+				where = "기";
 				break;
 			case "제2학생회관 (도착시간 +5분)":
 				where = "학";
 				break;
-			case "기숙사 정문 (도착시간 +10분)":
-				where = "기";
+			case "아카데미홀 (도착시간 +10분)":
+				where = "아";
 				break;
 			}
 			//where = where.equals("") ? "ㄱ" : "ㅎ";
@@ -223,7 +223,7 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 				if(where == null) {
 					// 전체 전송
 					String w = map.get("where") + "";
-					if(w.equals("학생회관 뒤") || w.equals("아카데미홀")) {
+					if(w.equals("학생회관 뒤") || w.equals("기숙사 정문")) {
 						delay_total += delay_min;
 					} else if(w.equals("제2학생회관 (도착시간 +5분)")) {
 						delay_total += delay_min + 5;
@@ -232,7 +232,7 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 					}
 				} else {
 					// 특정 장소 만 전송
-					if(where.equals("학생회관 뒤") || where.equals("아카데미홀")) {
+					if(where.equals("학생회관 뒤") || where.equals("기숙사 정문")) {
 						delay_total += delay_min;
 					} else if(where.equals("제2학생회관 (도착시간 +5분)")) {
 						delay_total += delay_min + 5;

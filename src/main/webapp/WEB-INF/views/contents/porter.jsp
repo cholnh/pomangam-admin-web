@@ -53,18 +53,18 @@
 						<option value="-1">전체</option>
 						<option value="1">학생회관 뒤</option>
 						<option value="2">기숙사 식당</option>
-						<option value="3">아카데미홀</option>
+						<option value="3">기숙사 정문</option>
 						<option value="4">제2학생회관</option> 
-						<option value="5">기숙사 정문</option>
+						<option value="5">아카데미홀</option>
 					<%} else if(curTarget.equals("1")) {%>
 						<option value="-1">전체</option>
 						<option value="1">학생회관 뒤</option>
 						<option value="2">기숙사 식당</option>
 					<%} else if(curTarget.equals("2")) {%>
 						<option value="-1">전체</option>
-						<option value="1">아카데미홀</option>
+						<option value="1">기숙사 정문</option>
 						<option value="2">제2학생회관</option>
-						<option value="3">기숙사 정문</option>
+						<option value="3">아카데미홀</option>
 					<%} %>
 					
 				</select>
@@ -232,9 +232,9 @@
 			            </label>
 			            <%} else if(curTarget.equals("2")) { %>
 			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="아카데미홀">
+			                <input type="radio" name="where" class="custom-control-input" value="기숙사 정문">
 			                <span class="custom-control-indicator"></span>
-			               	 아카데미홀
+			               	 기숙사 정문
 			            </label>
 			            <label class="custom-control custom-checkbox checkbox-inline">
 			                <input type="radio" name="where" class="custom-control-input" value="제2학생회관 (도착시간 +5분)">
@@ -242,9 +242,9 @@
 							제2학생회관
 			            </label>
 			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="기숙사 정문 (도착시간 +10분)">
+			                <input type="radio" name="where" class="custom-control-input" value="아카데미홀 (도착시간 +10분)">
 			                <span class="custom-control-indicator"></span>
-							기숙사 정문
+							아카데미홀
 			            </label>
 			            <%} %>
 			            
@@ -301,9 +301,9 @@
 			            </label>
 			            <%} else if(curTarget.equals("2")) { %>
 			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="아카데미홀">
+			                <input type="radio" name="where" class="custom-control-input" value="기숙사 정문">
 			                <span class="custom-control-indicator"></span>
-			               	 아카데미홀
+			               	 기숙사 정문
 			            </label>
 			            <label class="custom-control custom-checkbox checkbox-inline">
 			                <input type="radio" name="where" class="custom-control-input" value="제2학생회관 (도착시간 +5분)">
@@ -311,9 +311,9 @@
 							제2학생회관
 			            </label>
 			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="기숙사 정문 (도착시간 +10분)">
+			                <input type="radio" name="where" class="custom-control-input" value="아카데미홀 (도착시간 +10분)">
 			                <span class="custom-control-indicator"></span>
-							기숙사 정문
+							아카데미홀
 			            </label>
 			            <%} %>
 			            
@@ -414,7 +414,7 @@ $('#query_loc').change(function() {
 			});
 		} else if(loc == 3) {
 			$('#table').bootstrapTable('filterBy', {
-			    where : ['아카데미홀']
+			    where : ['기숙사 정문']
 			});
 		} else if(loc == 4) {
 			$('#table').bootstrapTable('filterBy', {
@@ -422,7 +422,7 @@ $('#query_loc').change(function() {
 			});
 		} else if(loc == 5) {
 			$('#table').bootstrapTable('filterBy', {
-			    where : ['기숙사 정문 (도착시간 +10분)']
+			    where : ['아카데미홀 (도착시간 +10분)']
 			});
 		}
 	} else if(curTarget == 1) {
@@ -438,7 +438,7 @@ $('#query_loc').change(function() {
 	} else if(curTarget == 2) {
 		if(loc == 1) {
 			$('#table').bootstrapTable('filterBy', {
-			    where : ['아카데미홀']
+			    where : ['기숙사 정문']
 			});
 		} else if(loc == 2) {
 			$('#table').bootstrapTable('filterBy', {
@@ -446,7 +446,7 @@ $('#query_loc').change(function() {
 			});
 		} else if(loc == 3) {
 			$('#table').bootstrapTable('filterBy', {
-			    where : ['기숙사 정문 (도착시간 +10분)']
+			    where : ['아카데미홀 (도착시간 +10분)']
 			});
 		}
 	}

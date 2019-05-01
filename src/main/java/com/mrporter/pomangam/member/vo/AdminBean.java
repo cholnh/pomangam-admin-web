@@ -16,4 +16,5 @@ public class AdminBean {
 	String username, password, nickname;
 	String moddate, role;
 	Integer idx_restaurant;
+	Integer idx_target;
 }

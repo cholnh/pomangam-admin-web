@@ -15,6 +15,7 @@ public class User implements UserDetails {
     private String nickname;
     private String groupname;
     private String moddate;
+    private Integer curTarget;
     
     private List<Role> authorities;
     private boolean accountNonExpired = true;

@@ -137,17 +137,8 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 						//System.out.println("phone_number : " + phone_number);
 						//System.out.println("text : " + text + menu);
 						
-						Object obj = BizmApi.send(phone_number, text + menu, tmplId).getBody();
-						Gson gson = new Gson();
-						List<ApiResultBean> bean = gson.fromJson(obj+"", new TypeToken<List<ApiResultBean>>() {}.getType());
-						if(!bean.get(0).getCode().equals("success")) {
-							// fail
-							indexDAO.setStatus(6, paymentIndex);
-						} else {
-							for(String idx : idxes) {
-								indexDAO.setOrderStatus(1, Integer.parseInt(idx));
-							}
-						}
+						BizmApi.send(phone_number, text + menu, tmplId);
+						
 					}
 				} else {
 					indexDAO.setStatus(6, paymentIndex);
@@ -250,12 +241,7 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 								"■ " + info;
 				
 				String phonenumber = map.get("phonenumber") + "";
-				Object obj = BizmApi.send(phonenumber, text, tmplId).getBody();
-				Gson gson = new Gson();
-				List<ApiResultBean> bean = gson.fromJson(obj+"", new TypeToken<List<ApiResultBean>>() {}.getType());
-				if(!bean.get(0).getCode().equals("success")) {
-					// fail
-				}
+				BizmApi.send(phonenumber, text, tmplId);
 			}
 		}
     }
@@ -329,12 +315,7 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 				
 				String phonenumber = map.get("phonenumber") + "";
 				
-				Object obj = BizmApi.send(phonenumber, text+info, tmplId).getBody();
-				Gson gson = new Gson();
-				List<ApiResultBean> bean = gson.fromJson(obj+"", new TypeToken<List<ApiResultBean>>() {}.getType());
-				if(!bean.get(0).getCode().equals("success")) {
-					// fail
-				}
+				BizmApi.send(phonenumber, text+info, tmplId);
 			}
 		}
     }
@@ -382,13 +363,7 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 						//System.out.println("phone_number : " + phone_number);
 						//System.out.println("text : " + text);
 						
-						Object obj = BizmApi.send(phone_number, text, tmplId).getBody();
-						Gson gson = new Gson();
-						List<ApiResultBean> bean = gson.fromJson(obj+"", new TypeToken<List<ApiResultBean>>() {}.getType());
-						if(!bean.get(0).getCode().equals("success")) {
-							// fail
-							indexDAO.setStatus(6, paymentIndex);
-						}
+						BizmApi.send(phone_number, text, tmplId);
 					}
 				} else {
 					indexDAO.setStatus(6, paymentIndex);

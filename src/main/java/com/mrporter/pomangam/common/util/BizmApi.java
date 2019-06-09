@@ -1,13 +1,5 @@
 package com.mrporter.pomangam.common.util;
 
-/**
- * BizmApi
- * 
- * @version 1.0 [2019. 3. 7.]
- * @author Choi
- */
-import org.springframework.http.ResponseEntity;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +11,7 @@ public class BizmApi {
     private static final String subUrl = "/v2/sender/send";
     private static final boolean isSsl = true;
 
-    public static ResponseEntity<?> send(String phn, String msg, String tmplId) {
+    public static void send(String phn, String msg, String tmplId) {
         ApiClientUtils apiClientUtils = new ApiClientUtils(domain, isSsl);
 
         Map<String, String> header = new HashMap<>();
@@ -35,6 +27,6 @@ public class BizmApi {
         body.put("smsKind", "L");
         body.put("smsSender", "01064784899");
         
-        return apiClientUtils.sendByPost(header, body, subUrl);
+        apiClientUtils.sendByPost(header, body, subUrl);
     }
 }

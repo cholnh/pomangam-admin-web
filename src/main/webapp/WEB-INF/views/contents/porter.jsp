@@ -82,8 +82,7 @@
 				<div class="col-sm-6">
 				</div>
 				<div class="col-sm-6">
-					<!-- <a class="btn btn-info" id="export"><i
-						class="ion-android-download"></i> <span>내보내기</span></a> -->
+					 <a class="btn btn-info" id="export"><span>내보내기</span></a>
 					<a class="btn btn-info" id="copypn"><span>번호복사</span></a>
 					<a class="btn btn-info" id="total"><span>전체보기</span></a>
 					<a class="btn btn-info" id="viewdetail"><span>상세보기</span></a>
@@ -549,7 +548,8 @@ function order() {
 		}
 	}
 	
-	if(confirm('주문완료 상태로 변경 하시겠습니까?')) {
+	if(confirm('총 ' + selections.length + '개\n' + '주문완료 상태로 변경 하시겠습니까?')) {
+		LoadingWithMask();
 		copy();
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
@@ -581,15 +581,17 @@ function order() {
 					},
 					success : function(e) {
 						$('#table2').bootstrapTable('load', e);
-						
+						closeLoadingWithMask();
 					},
 					error : function(msg) {
 						alert('ajax error' + msg);
+						closeLoadingWithMask();
 					}
 				});
 			},
 			error : function(msg) {
 				alert('ajax error' + msg);
+				closeLoadingWithMask();
 			}
 		});
 	}
@@ -952,8 +954,9 @@ $('#paycancel').off('click').on('click', function(e) {
 		selectedIdxes += selections[index].idx + ',';
 	}
 	
-	if(confirm('취소 상태로 변경 하시겠습니까?')) {
+	if(confirm('총 ' + selections.length + '개\n' + '취소 상태로 변경 하시겠습니까?')) {
 		var isMsg = confirm('업체에게 전송 하시겠습니까?');
+		LoadingWithMask();
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
 		$.ajax({
@@ -968,9 +971,11 @@ $('#paycancel').off('click').on('click', function(e) {
 			},
 			success : function(data) {
 				$('#table').bootstrapTable('refresh');
+				closeLoadingWithMask();
 			},
 			error : function(msg) {
 				alert('ajax error' + msg);
+				closeLoadingWithMask();
 			}
 		});
 	}
@@ -989,8 +994,9 @@ $('#payrefund').off('click').on('click', function(e) {
 		selectedIdxes += selections[index].idx + ',';
 	}
 	
-	if(confirm('환불 상태로 변경 하시겠습니까?')) {
+	if(confirm('총 ' + selections.length + '개\n' + '환불 상태로 변경 하시겠습니까?')) {
 		var isMsg = confirm('업체에게 전송 하시겠습니까?');
+		LoadingWithMask();
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
 		$.ajax({
@@ -1005,9 +1011,11 @@ $('#payrefund').off('click').on('click', function(e) {
 			},
 			success : function(data) {
 				$('#table').bootstrapTable('refresh');
+				closeLoadingWithMask();
 			},
 			error : function(msg) {
 				alert('ajax error' + msg);
+				closeLoadingWithMask();
 			}
 		});
 	}
@@ -1026,8 +1034,9 @@ $('#paydone').off('click').on('click', function(e) {
 		selectedIdxes += selections[index].idx + ',';
 	}
 	
-	if(confirm('입금완료 상태로 변경 하시겠습니까?')) {
+	if(confirm('총 ' + selections.length + '개\n' + '입금완료 상태로 변경 하시겠습니까?')) {
 		var isMsg = confirm('업체에게 전송 하시겠습니까?');
+		LoadingWithMask();
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
 		$.ajax({
@@ -1042,9 +1051,11 @@ $('#paydone').off('click').on('click', function(e) {
 			},
 			success : function(data) {
 				$('#table').bootstrapTable('refresh');
+				closeLoadingWithMask();
 			},
 			error : function(msg) {
 				alert('ajax error' + msg);
+				closeLoadingWithMask();
 			}
 		});
 	}
@@ -1166,5 +1177,53 @@ $('#total').off('click').on('click', function(e) {
 	});
 });
 	
+
+function LoadingWithMask() {
+    //화면의 높이와 너비
+    var maskHeight = $(document).height();
+    var maskWidth  = window.document.body.clientWidth;
+     
+    //화면에 출력할 마스크를 설정
+    var mask       = "<div id='mask' style='position:absolute; z-index:9000; background-color:#000000; display:none; left:0; top:0;'></div>";
+    var loadingImg = '';
+      
+    loadingImg += "<div id='loadingImg'>";
+    loadingImg += " <img src='resources/img/LoadingImg.gif' style='display: block; margin: 0px auto;  '/>";
+    loadingImg += "</div>"; 
+  
+    //화면에 레이어 추가
+    $('body')
+        .append(mask);
+       $('body')
+        .append(loadingImg);
+        
+    //마스크의 높이와 너비를 화면 것으로 만들어 전체 화면을 채움
+    $('#mask').css({
+            'width' : maskWidth
+            , 'height': maskHeight
+            , 'opacity' : '0.3'
+    });
+    
+    $('#loadingImg').css({
+    	'position' : 'absolute',
+    
+       'top' : (($(window).height()-200)/2+$(window).scrollTop())+'px',
+       'left' : (($(window).width()-200)/2+$(window).scrollLeft())+'px',
+    
+       'opacity' : '1'
+    });
+
+  
+    //마스크 표시
+    $('#mask').show();  
+  
+    //로딩중 이미지 표시
+    $('#loadingImg').show();
+}
+
+function closeLoadingWithMask() {
+    $('#mask, #loadingImg').hide();
+    $('#mask, #loadingImg').remove(); 
+}
 
 </script>

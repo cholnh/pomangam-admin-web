@@ -20,6 +20,9 @@ import org.springframework.web.client.RestTemplate;
  * @author Choi
  */
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.mrporter.pomangam.order.vo.ApiResultBean;
 
 public class ApiClientUtils {
 
@@ -42,14 +45,14 @@ public class ApiClientUtils {
         apiUrl = (isSsl ? "https" : "http") + "://" + domain + ":" + apiPort;
     }
 
-    public ResponseEntity<?> sendByPost(Map<String, String> header, Map<String, Object> body, String subUrl) {
+    public void sendByPost(Map<String, String> header, Map<String, Object> body, String subUrl) {
         String bodyAsString;
         try {
             List list = new ArrayList<>();
             list.add(body);
             bodyAsString = objectMapper.writeValueAsString(list);
         } catch (IOException e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return;
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -59,9 +62,13 @@ public class ApiClientUtils {
                 headers.add(k, v);
             });
         }
-        return restTemplate.postForEntity(
-                (apiUrl + subUrl),
-                new HttpEntity(bodyAsString, headers),
-                String.class);
+        
+        new Thread(() -> {
+        	restTemplate.postForEntity(
+			        (apiUrl + subUrl),
+			        new HttpEntity(bodyAsString, headers),
+			        String.class);
+        }).start();
+        
     }
 }

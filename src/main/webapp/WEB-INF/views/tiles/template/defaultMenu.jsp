@@ -14,6 +14,9 @@
 	case "2":
 		curTargetName = "군산대학교";
 		break;
+	case "3":
+		curTargetName = "호원대학교";
+		break;
 	}
 	
 %>
@@ -38,6 +41,7 @@
 					<li><a href="./session/setItem.do?key=curTarget&value=0" >전체</a></li>
 					<li><a href="./session/setItem.do?key=curTarget&value=1" >항공대학교</a></li>
 					<li><a href="./session/setItem.do?key=curTarget&value=2" >군산대학교</a></li>
+					<li><a href="./session/setItem.do?key=curTarget&value=3" >호원대학교</a></li>
 				</ul>
 			</li>
 			<li class="dropdown"><a class="dropdown-toggle"

@@ -56,6 +56,9 @@
 						<option value="3">기숙사 정문</option>
 						<option value="4">제2학생회관</option> 
 						<option value="5">아카데미홀</option>
+						<option value="6">연암관</option>
+						<option value="7">다산관/반계관</option>
+						<option value="8">오륜관/난설허관</option>
 					<%} else if(curTarget.equals("1")) {%>
 						<option value="-1">전체</option>
 						<option value="1">학생회관 뒤</option>
@@ -65,7 +68,13 @@
 						<option value="1">기숙사 정문</option>
 						<option value="2">제2학생회관</option>
 						<option value="3">아카데미홀</option>
+					<%} else if(curTarget.equals("3")) {%>
+						<option value="-1">전체</option>
+						<option value="1">연암관</option>
+						<option value="2">다산관/반계관</option>
+						<option value="3">오륜관/난설허관</option>
 					<%} %>
+					
 					
 				</select>
 			</div>
@@ -245,6 +254,22 @@
 			                <span class="custom-control-indicator"></span>
 							아카데미홀
 			            </label>
+			            <%} else if(curTarget.equals("3")) { %>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="연암관">
+			                <span class="custom-control-indicator"></span>
+			               	 연암관
+			            </label>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="다산관/반계관 (+3분)">
+			                <span class="custom-control-indicator"></span>
+							다산관/반계관
+			            </label>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="오륜관/난설허관 (+6분)">
+			                <span class="custom-control-indicator"></span>
+							오륜관/난설허관
+			            </label>
 			            <%} %>
 			            
 					</div>
@@ -313,6 +338,22 @@
 			                <input type="radio" name="where" class="custom-control-input" value="아카데미홀 (도착시간 +10분)">
 			                <span class="custom-control-indicator"></span>
 							아카데미홀
+			            </label>
+			           <%} else if(curTarget.equals("3")) { %>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="연암관">
+			                <span class="custom-control-indicator"></span>
+			               	 연암관
+			            </label>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="다산관/반계관 (+3분)">
+			                <span class="custom-control-indicator"></span>
+							다산관/반계관
+			            </label>
+			            <label class="custom-control custom-checkbox checkbox-inline">
+			                <input type="radio" name="where" class="custom-control-input" value="오륜관/난설허관 (+6분)">
+			                <span class="custom-control-indicator"></span>
+							오륜관/난설허관
 			            </label>
 			            <%} %>
 			            
@@ -411,6 +452,7 @@ $('#query_loc').change(function() {
 			$('#table').bootstrapTable('filterBy', {
 			    where : ['기숙사 식당 (도착시간 +10분)']
 			});
+			
 		} else if(loc == 3) {
 			$('#table').bootstrapTable('filterBy', {
 			    where : ['기숙사 정문']
@@ -423,7 +465,21 @@ $('#query_loc').change(function() {
 			$('#table').bootstrapTable('filterBy', {
 			    where : ['아카데미홀 (도착시간 +10분)']
 			});
+			
+		} else if(loc == 6) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['연암관']
+			});
+		} else if(loc == 7) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['다산관/반계관 (+3분)']
+			});
+		} else if(loc == 8) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['오륜관/난설허관 (+6분)']
+			});
 		}
+		
 	} else if(curTarget == 1) {
 		if(loc == 1) {
 			$('#table').bootstrapTable('filterBy', {
@@ -446,6 +502,20 @@ $('#query_loc').change(function() {
 		} else if(loc == 3) {
 			$('#table').bootstrapTable('filterBy', {
 			    where : ['아카데미홀 (도착시간 +10분)']
+			});
+		}
+	} else if(curTarget == 3) {
+		if(loc == 1) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['연암관']
+			});
+		} else if(loc == 2) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['다산관/반계관 (+3분)']
+			});
+		} else if(loc == 3) {
+			$('#table').bootstrapTable('filterBy', {
+			    where : ['오륜관/난설허관 (+6분)']
 			});
 		}
 	}

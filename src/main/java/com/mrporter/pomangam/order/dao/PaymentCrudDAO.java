@@ -59,6 +59,7 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			String receive_time = lom.get(0).get("receive_time")+"";
 			String phonenumber = lom.get(0).get("phonenumber")+"";
 			String where = lom.get(0).get("where")+"";
+			boolean isHowon = false;
 			switch(where) {
 			case "학생회관 뒤":
 				where = "ㅎ";
@@ -75,6 +76,18 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			case "아카데미홀 (도착시간 +10분)":
 				where = "아";
 				break;
+			case "연암관":
+				where = "연";
+				isHowon = true;
+				break;
+			case "다산관/반계관 (+3분)":
+				where = "다";
+				isHowon = true;
+				break;
+			case "오륜관/난설허관 (+6분)":
+				where = "오";
+				isHowon = true;
+				break;
 			}
 			//where = where.equals("") ? "ㄱ" : "ㅎ";
 			int approvalTime = Integer.parseInt(receive_time.replace("시", "")) - 1;
@@ -85,7 +98,7 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			
 			String text = 	"주문번호 : " + where + "-" + idx_box + " (no." + paymentIndex + ")" + System.lineSeparator() +
 					"배달시간 : " + receive_date + " (" + receive_time + " 00분)" + System.lineSeparator() +
-					"※ " + approvalTime + "시 40~45분에 방문 예정 ※" + System.lineSeparator() +
+					"※ " + approvalTime + "시 " + (isHowon ? "50" : "40~45") + "분에 방문 예정 ※" + System.lineSeparator() +
 					"------------------------" + System.lineSeparator();
 					
 			
@@ -218,6 +231,10 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 						delay_total += delay_min;
 					} else if(w.equals("제2학생회관 (도착시간 +5분)")) {
 						delay_total += delay_min + 5;
+					} else if(w.equals("다산관/반계관 (+3분)")) {
+						delay_total += delay_min + 3;
+					} else if(w.equals("오륜관/난설허관 (+6분)")) {
+						delay_total += delay_min + 6;
 					} else {
 						delay_total += delay_min + 10;
 					}
@@ -227,6 +244,10 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 						delay_total += delay_min;
 					} else if(where.equals("제2학생회관 (도착시간 +5분)")) {
 						delay_total += delay_min + 5;
+					} else if(where.equals("다산관/반계관 (+3분)")) {
+						delay_total += delay_min + 3;
+					} else if(where.equals("오륜관/난설허관 (+6분)")) {
+						delay_total += delay_min + 6;
 					} else {
 						delay_total += delay_min + 10;
 					}

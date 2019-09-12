@@ -240,52 +240,15 @@
 			                <span class="custom-control-indicator"></span>
 			               	 전체
 			            </label>
-			            
-			            <%if(curTarget.equals("1")) { %>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="학생회관 뒤">
-			                <span class="custom-control-indicator"></span>
-			               	 학생회관 뒤
-			            </label>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="기숙사 식당 (도착시간 +10분)">
-			                <span class="custom-control-indicator"></span>
-							기숙사 식당
-			            </label>
-			            <%} else if(curTarget.equals("2")) { %>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="기숙사 정문">
-			                <span class="custom-control-indicator"></span>
-			               	 기숙사 정문
-			            </label>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="제2학생회관 (도착시간 +5분)">
-			                <span class="custom-control-indicator"></span>
-							제2학생회관
-			            </label>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="아카데미홀 (도착시간 +10분)">
-			                <span class="custom-control-indicator"></span>
-							아카데미홀
-			            </label>
-			            <%} else if(curTarget.equals("3")) { %>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="연암관">
-			                <span class="custom-control-indicator"></span>
-			               	 연암관
-			            </label>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="다산관/반계관 (+3분)">
-			                <span class="custom-control-indicator"></span>
-							다산관/반계관
-			            </label>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="오륜관/난설허관 (+6분)">
-			                <span class="custom-control-indicator"></span>
-							오륜관/난설허관
-			            </label>
-			            <%} %>
-			            
+			            <%
+			            if(detailList != null) {
+			            	for(TargetDetailBean bean : detailList) { %>
+					            <label class="custom-control custom-checkbox checkbox-inline">
+					                <input type="radio" name="where" class="custom-control-input" value="<%=bean.getIdx()%>">
+					                <span class="custom-control-indicator"></span>
+					               	 <%=bean.getName()%>
+					            </label>
+			            <%}} %>
 					</div>
 				</div>
 				<hr>
@@ -325,51 +288,15 @@
 			                <span class="custom-control-indicator"></span>
 			               	 전체
 			            </label>
-			            
-			            <%if(curTarget.equals("1")) { %>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="학생회관 뒤">
-			                <span class="custom-control-indicator"></span>
-			               	 학생회관 뒤
-			            </label>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="기숙사 식당 (도착시간 +10분)">
-			                <span class="custom-control-indicator"></span>
-							기숙사 식당
-			            </label>
-			            <%} else if(curTarget.equals("2")) { %>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="기숙사 정문">
-			                <span class="custom-control-indicator"></span>
-			               	 기숙사 정문
-			            </label>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="제2학생회관 (도착시간 +5분)">
-			                <span class="custom-control-indicator"></span>
-							제2학생회관
-			            </label>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="아카데미홀 (도착시간 +10분)">
-			                <span class="custom-control-indicator"></span>
-							아카데미홀
-			            </label>
-			           <%} else if(curTarget.equals("3")) { %>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="연암관">
-			                <span class="custom-control-indicator"></span>
-			               	 연암관
-			            </label>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="다산관/반계관 (+3분)">
-			                <span class="custom-control-indicator"></span>
-							다산관/반계관
-			            </label>
-			            <label class="custom-control custom-checkbox checkbox-inline">
-			                <input type="radio" name="where" class="custom-control-input" value="오륜관/난설허관 (+6분)">
-			                <span class="custom-control-indicator"></span>
-							오륜관/난설허관
-			            </label>
-			            <%} %>
+			            <%
+			            if(detailList != null) {
+			            	for(TargetDetailBean bean : detailList) { %>
+					            <label class="custom-control custom-checkbox checkbox-inline">
+					                <input type="radio" name="where" class="custom-control-input" value="<%=bean.getIdx()%>">
+					                <span class="custom-control-indicator"></span>
+					               	 <%=bean.getName()%>
+					            </label>
+			            <%}} %>
 			            
 					</div>
 				</div>
@@ -394,7 +321,7 @@
 				<div class="form-group">
 					<label class="col-md-3 control-label">지연 시간 (분 단위)</label>
 					<div class="col-md-6">
-						<input type="number" id="delay_min" min=0 value=0>분
+						<input type="number" id="delay_min" min=0 placeholder="0">분
 					</div>
 				</div>
 				<br><br>
@@ -422,7 +349,7 @@ var orderTimeList = <%=new Gson().toJson(orderTimeList)%>;
 $('#test').hide();
 $('#copyarea').hide();
 
-console.log(orderTimeList);
+//console.log(orderTimeList);
 
 var paramtime = '<%=paramtime%>';
 //var time_list = [12,13,14,17,18,19,21,22];
@@ -434,36 +361,38 @@ function twoDigits(input) {
 	return input;
 }
 
-orderTimeList.forEach(function(e){
-	var text = e.arrivalTime.split(" ")[0].split(":");
-	var arrivalTime = new Date();
-	arrivalTime.setHours(text[0]);
-	arrivalTime.setMinutes(text[1]);
-	arrivalTime.setSeconds(text[2]);
-	arrivalTime.setMilliseconds(0);
-	
-	var t = e.arrivalTime.split(" ")[1] + ' ' + arrivalTime.getHours()+'시 '+(arrivalTime.getMinutes()>0?arrivalTime.getMinutes()+'분':'');
-	var value = twoDigits(((e.arrivalTime.split(" ")[1] == '오후' ? 12 : 0) + arrivalTime.getHours())) + ':' + twoDigits(arrivalTime.getMinutes()) + ':00';
-	var tf = false;
-	if(paramtime != null && (paramtime == value)) {
-		tf = true;
-	}
-	$('#query_time').append($('<option>', {
-	    text: t,
-	    value: value,
-	    selected: tf
-	}));
-	$('#arrivesel').append($('<option>', {
-	    text: t,
-	    value: value,
-	    selected: tf
-	}));
-	$('#arrivesel2').append($('<option>', {
-	    text: t,
-	    value: value,
-	    selected: tf
-	}));
-});
+if(orderTimeList) {
+	orderTimeList.forEach(function(e){
+		var text = e.arrivalTime.split(" ")[0].split(":");
+		var arrivalTime = new Date();
+		arrivalTime.setHours(text[0]);
+		arrivalTime.setMinutes(text[1]);
+		arrivalTime.setSeconds(text[2]);
+		arrivalTime.setMilliseconds(0);
+		
+		var t = e.arrivalTime.split(" ")[1] + ' ' + arrivalTime.getHours()+'시 '+(arrivalTime.getMinutes()>0?arrivalTime.getMinutes()+'분':'');
+		var value = twoDigits(((e.arrivalTime.split(" ")[1] == '오후' && arrivalTime.getHours() != 12 ? 12 : 0) + arrivalTime.getHours())) + ':' + twoDigits(arrivalTime.getMinutes()) + ':00';
+		var tf = false;
+		if(paramtime != null && (paramtime == value)) {
+			tf = true;
+		}
+		$('#query_time').append($('<option>', {
+		    text: t,
+		    value: value,
+		    selected: tf
+		}));
+		$('#arrivesel').append($('<option>', {
+		    text: t,
+		    value: value,
+		    selected: tf
+		}));
+		$('#arrivesel2').append($('<option>', {
+		    text: t,
+		    value: value,
+		    selected: tf
+		}));
+	});
+}
 
 $('#query_time').change(function() {
 	var t = $(this).val();
@@ -480,94 +409,13 @@ $('#query_loc').change(function() {
 	for(var i=0; i<detailList.length; i++) {
 		var detail = detailList[i];
 		if(detail.idx == loc) {
-			console.log("search... : " + detail.idx );
+			//console.log("search... : " + detail.idx );
 			$('#table').bootstrapTable('filterBy', {
 			    where : [detail.idx+'']
 			});
 			break;
 		}
 	}
-	
-	/*
-	$('#table').bootstrapTable('filterBy');
-	
-	if(curTarget == 0) {
-		if(loc == 1) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['학생회관 뒤']
-			});
-		} else if(loc == 2) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['기숙사 식당 (도착시간 +10분)']
-			});
-			
-		} else if(loc == 3) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['기숙사 정문']
-			});
-		} else if(loc == 4) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['제2학생회관 (도착시간 +5분)']
-			});
-		} else if(loc == 5) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['아카데미홀 (도착시간 +10분)']
-			});
-			
-		} else if(loc == 6) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['연암관']
-			});
-		} else if(loc == 7) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['다산관/반계관 (+3분)']
-			});
-		} else if(loc == 8) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['오륜관/난설허관 (+6분)']
-			});
-		}
-		
-	} else if(curTarget == 1) {
-		if(loc == 1) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['학생회관 뒤']
-			});
-		} else if(loc == 2) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['기숙사 식당 (도착시간 +10분)']
-			});
-		}
-	} else if(curTarget == 2) {
-		if(loc == 1) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['기숙사 정문']
-			});
-		} else if(loc == 2) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['제2학생회관 (도착시간 +5분)']
-			});
-		} else if(loc == 3) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['아카데미홀 (도착시간 +10분)']
-			});
-		}
-	} else if(curTarget == 3) {
-		if(loc == 1) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['연암관']
-			});
-		} else if(loc == 2) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['다산관/반계관 (+3분)']
-			});
-		} else if(loc == 3) {
-			$('#table').bootstrapTable('filterBy', {
-			    where : ['오륜관/난설허관 (+6분)']
-			});
-		}
-	}
-	*/
 });
 
 $('#query_restaurant').change(function() {
@@ -621,7 +469,6 @@ function statusFormatter(value, row) {
 }
 
 function whereFormatter(value, row) {
-	console.log(value);
 	return detailMap[value];
 }
 

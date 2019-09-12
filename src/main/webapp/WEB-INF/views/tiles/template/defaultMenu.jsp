@@ -1,24 +1,22 @@
+<%@page import="com.mrporter.pomangam.target.vo.TargetBean"%>
+<%@page import="java.util.List"%>
+<%@page import="com.google.gson.Gson"%>
+<%@page import="com.mrporter.pomangam.target.dao.TargetCrudDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!-- Navbar -->
 
 <%
 	String curTarget = session.getAttribute("curTarget") == null ? "0" : session.getAttribute("curTarget")+"";
+	List<TargetBean> targetList = new TargetCrudDAO().getCompactBeanList();
 	String curTargetName = "전체";
-	switch(curTarget) {
-	case "0":
-		curTargetName = "전체";
-		break;
-	case "1":
-		curTargetName = "항공대학교";
-		break;
-	case "2":
-		curTargetName = "군산대학교";
-		break;
-	case "3":
-		curTargetName = "호원대학교";
-		break;
+	if(targetList != null) {
+		for(TargetBean bean : targetList) {
+			if(bean.getIdx().intValue() == Integer.parseInt(curTarget)) {
+				curTargetName = bean.getName();
+				break;
+			}
+		}
 	}
-	
 %>
 
 <nav class="navbar px-navbar">
@@ -39,9 +37,11 @@
 				aria-expanded="false" id="target"><%=curTargetName %></a>
 				<ul class="dropdown-menu">
 					<li><a href="./session/setItem.do?key=curTarget&value=0" >전체</a></li>
-					<li><a href="./session/setItem.do?key=curTarget&value=1" >항공대학교</a></li>
-					<li><a href="./session/setItem.do?key=curTarget&value=2" >군산대학교</a></li>
-					<li><a href="./session/setItem.do?key=curTarget&value=3" >호원대학교</a></li>
+					<%if(targetList != null) { 
+						for(TargetBean bean : targetList) {
+					%>
+						<li><a href="./session/setItem.do?key=curTarget&value=<%=bean.getIdx() %>" ><%=bean.getName() %></a></li>
+					<%}} %>
 				</ul>
 			</li>
 			<li class="dropdown"><a class="dropdown-toggle"

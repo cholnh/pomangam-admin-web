@@ -47,6 +47,7 @@ public class TargetController {
 		return list;
 	}
 	
+	
 	@RequestMapping(value = "/"+MAPPINGNAME+"/getbean.do", 
 			produces = "application/json; charset=utf-8")
 	public @ResponseBody String getBean(

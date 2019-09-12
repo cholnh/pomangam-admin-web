@@ -1,5 +1,7 @@
 package com.mrporter.pomangam.order.dao;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,8 @@ import com.mrporter.pomangam.common.util.BizmApi;
 import com.mrporter.pomangam.common.util.Date;
 import com.mrporter.pomangam.order.vo.OrderTimeBean;
 import com.mrporter.pomangam.order.vo.PaymentBean;
+import com.mrporter.pomangam.target.dao.TargetCrudDAO;
+import com.mrporter.pomangam.target.vo.TargetDetailBean;
 
 /**
  * PaymentCrudDAO
@@ -83,49 +87,35 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			String receive_time = lom.get(0).get("receive_time")+"";
 			String phonenumber = lom.get(0).get("phonenumber")+"";
 			String where = lom.get(0).get("where")+"";
-			boolean isHowon = false;
-			switch(where) {
-			case "학생회관 뒤":
-				where = "ㅎ";
-				break;
-			case "기숙사 식당 (도착시간 +10분)":
-				where = "ㄱ";
-				break;
-			case "기숙사 정문":
-				where = "기";
-				break;
-			case "제2학생회관 (도착시간 +5분)":
-				where = "학";
-				break;
-			case "아카데미홀 (도착시간 +10분)":
-				where = "아";
-				break;
-			case "연암관":
-				where = "연";
-				isHowon = true;
-				break;
-			case "다산관/반계관 (+3분)":
-				where = "다";
-				isHowon = true;
-				break;
-			case "오륜관/난설허관 (+6분)":
-				where = "오";
-				isHowon = true;
-				break;
+			Integer idx_target = Integer.parseInt(lom.get(0).get("idx_target")+"");
+			Integer idx_order_time = Integer.parseInt(lom.get(0).get("idx_order_time")+"");
+			
+			List<Map<String, Object>> lom_pickup
+			= sqlQuery(
+					"SELECT * FROM db_pomangam.order_time WHERE idx = ?;", idx_order_time);
+			String pickUpTime = lom_pickup.get(0).get("pickUpTime")+"";
+			
+			List<TargetDetailBean> detailList = new TargetCrudDAO().getDetailList(idx_target);
+			if(detailList != null) {
+				for(TargetDetailBean bean : detailList) {
+					if(bean.getIdx().intValue() == Integer.parseInt(where)) {
+						where = bean.getAbbr_name();
+						break;
+					}
+				}
 			}
 			//where = where.equals("") ? "ㄱ" : "ㅎ";
-			int approvalTime = Integer.parseInt(receive_time.replace("시", "")) - 1;
+			//int approvalTime = Integer.parseInt(receive_time.replace("시", "")) - 1;
 			
 			List<Map<String, Object>> lom2 
 			= sqlQuery(
 					"SELECT idx_restaurant FROM payment WHERE idx_payment_index = ? group by idx_restaurant;", paymentIndex);
 			
 			String text = 	"주문번호 : " + where + "-" + idx_box + " (no." + paymentIndex + ")" + System.lineSeparator() +
-					"배달시간 : " + receive_date + " (" + receive_time + " 00분)" + System.lineSeparator() +
-					"※ " + approvalTime + "시 " + (isHowon ? "50" : "40~45") + "분에 방문 예정 ※" + System.lineSeparator() +
+					"배달시간 : " + receive_date + " (" + receive_time + ")" + System.lineSeparator() +
+					"※ " + pickUpTime + "에 방문 예정 ※" + System.lineSeparator() +
 					"------------------------" + System.lineSeparator();
 					
-			
 			for(Map<String, Object> map : lom2) {
 				
 				String idx_restaurant = map.get("idx_restaurant")+"";
@@ -175,15 +165,11 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 						//System.out.println("text : " + text + menu);
 						
 						BizmApi.send(phone_number, text + menu, tmplId);
-						
 					}
 				} else {
 					indexDAO.setStatus(6, paymentIndex);
 				}
 			}
-			
-			
-			
 		}
 	}
 	
@@ -195,21 +181,21 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
 				lom = sqlQuery(
 						"SELECT " +
-								"    phonenumber, pi.where " +
-								"FROM " +
-								"    payment_index pi " +
-								"WHERE " +
-								"    receive_date = CURDATE() " +
-								"    AND receive_time = ? ", receive_time);
+						"    phonenumber, pi.where " +
+						"FROM " +
+						"    payment_index pi " +
+						"WHERE " +
+						"    receive_date = CURDATE() " +
+						"    AND receive_time = ? ", receive_time);
 			} else {
 				lom = sqlQuery(
 						"SELECT " +
-								"    phonenumber, pi.where " +
-								"FROM " +
-								"    payment_index pi " +
-								"WHERE " +
-								"    receive_date = CURDATE() " +
-								"    AND receive_time = ? AND idx_target = ? ", receive_time, curTarget);
+						"    phonenumber, pi.where " +
+						"FROM " +
+						"    payment_index pi " +
+						"WHERE " +
+						"    receive_date = CURDATE() " +
+						"    AND receive_time = ? AND idx_target = ? ", receive_time, curTarget);
 			}
 			
 			
@@ -218,23 +204,23 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
 				lom = sqlQuery(
 						"SELECT " +
-								"    phonenumber, pi.where " +
-								"FROM " +
-								"    payment_index pi " +
-								"WHERE " +
-								"    receive_date = CURDATE() " +
-								"    AND receive_time = ? " +
-								"    AND pi.where = ? ", receive_time, where);
+						"    phonenumber, pi.where " +
+						"FROM " +
+						"    payment_index pi " +
+						"WHERE " +
+						"    receive_date = CURDATE() " +
+						"    AND receive_time = ? " +
+						"    AND pi.where = ? ", receive_time, where);
 			} else {
 				lom = sqlQuery(
 						"SELECT " +
-								"    phonenumber, pi.where " +
-								"FROM " +
-								"    payment_index pi " +
-								"WHERE " +
-								"    receive_date = CURDATE() " +
-								"    AND receive_time = ? " +
-								"    AND pi.where = ? AND idx_target = ? ", receive_time, where, curTarget);
+						"    phonenumber, pi.where " +
+						"FROM " +
+						"    payment_index pi " +
+						"WHERE " +
+						"    receive_date = CURDATE() " +
+						"    AND receive_time = ? " +
+						"    AND pi.where = ? AND idx_target = ? ", receive_time, where, curTarget);
 			}
 			
 		}
@@ -245,12 +231,27 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 							"■ 문의 : 플친 → [채팅하기]" + System.lineSeparator() +
 							"http://pf.kakao.com/_xlxbhlj\n";  			
 			
+			List<TargetDetailBean>  detailList = null;
+			if(curTarget != null) {
+				detailList = new TargetCrudDAO().getDetailList(Integer.parseInt(curTarget));
+			}
+			
 			for(Map<String, Object> map : lom) {
-				int delay_total = 0;
+				LocalTime delayTime = LocalTime.parse(receive_time, DateTimeFormatter.ofPattern("HH:mm:ss"));
 				
 				if(where == null) {
 					// 전체 전송
-					String w = map.get("where") + "";
+					int w = Integer.parseInt(map.get("where") + "");
+					if(detailList != null) {
+						for(TargetDetailBean bean : detailList) {
+							if(bean.getIdx().intValue() == w) {
+								delayTime = delayTime.plusMinutes(bean.getIncreasing_time().toLocalTime().getMinute());
+								break;
+							}
+						}
+					}
+					
+					/*
 					if(w.equals("학생회관 뒤") || w.equals("기숙사 정문")) {
 						delay_total += delay_min;
 					} else if(w.equals("제2학생회관 (도착시간 +5분)")) {
@@ -262,8 +263,18 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 					} else {
 						delay_total += delay_min + 10;
 					}
+					*/
 				} else {
 					// 특정 장소 만 전송
+					if(detailList != null) {
+						for(TargetDetailBean bean : detailList) {
+							if(bean.getIdx().intValue() == Integer.parseInt(where)) {
+								delayTime = delayTime.plusMinutes(bean.getIncreasing_time().toLocalTime().getMinute());
+								break;
+							}
+						}
+					}
+					/*
 					if(where.equals("학생회관 뒤") || where.equals("기숙사 정문")) {
 						delay_total += delay_min;
 					} else if(where.equals("제2학생회관 (도착시간 +5분)")) {
@@ -275,12 +286,14 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 					} else {
 						delay_total += delay_min + 10;
 					}
+					*/
 				}
+				delayTime = delayTime.plusMinutes(delay_min);
 				String text = 	"[포만감 배달 지연 안내]" + System.lineSeparator() +
 								"배달 도착시간이 약 " + delay_min + "분 간 지연되어 안내드립니다." + System.lineSeparator() +
 									System.lineSeparator() +
 								"▷ 사유 : " + delay_reason + System.lineSeparator() +
-								"▷ 예상 도착 시간 : " + receive_time + " " + delay_total + "분" + System.lineSeparator() +
+								"▷ 예상 도착 시간 : " + delayTime + System.lineSeparator() +
 									System.lineSeparator() +
 								"[안내문]" + System.lineSeparator() +
 								"■ " + info;
@@ -300,44 +313,44 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
 				lom = sqlQuery(
 						"SELECT " +
-								"    phonenumber, pi.where " +
-								"FROM " +
-								"    payment_index pi " +
-								"WHERE " +
-								"    receive_date = CURDATE() " +
-								"    AND receive_time = ? ", receive_time);
+						"    phonenumber, pi.where " +
+						"FROM " +
+						"    payment_index pi " +
+						"WHERE " +
+						"    receive_date = CURDATE() " +
+						"    AND receive_time = ? ", receive_time);
 			} else {
 				lom = sqlQuery(
 						"SELECT " +
-								"    phonenumber, pi.where " +
-								"FROM " +
-								"    payment_index pi " +
-								"WHERE " +
-								"    receive_date = CURDATE() " +
-								"    AND receive_time = ? AND idx_target = ? ", receive_time, curTarget);
+						"    phonenumber, pi.where " +
+						"FROM " +
+						"    payment_index pi " +
+						"WHERE " +
+						"    receive_date = CURDATE() " +
+						"    AND receive_time = ? AND idx_target = ? ", receive_time, curTarget);
 			}
 			
 		} else {
 			if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
 				lom = sqlQuery(
 						"SELECT " +
-								"    phonenumber, pi.where " +
-								"FROM " +
-								"    payment_index pi " +
-								"WHERE " +
-								"    receive_date = CURDATE() " +
-								"    AND receive_time = ? " +
-								"    AND pi.where = ? ", receive_time, where);
+						"    phonenumber, pi.where " +
+						"FROM " +
+						"    payment_index pi " +
+						"WHERE " +
+						"    receive_date = CURDATE() " +
+						"    AND receive_time = ? " +
+						"    AND pi.where = ? ", receive_time, where);
 			} else {
 				lom = sqlQuery(
 						"SELECT " +
-								"    phonenumber, pi.where " +
-								"FROM " +
-								"    payment_index pi " +
-								"WHERE " +
-								"    receive_date = CURDATE() " +
-								"    AND receive_time = ? " +
-								"    AND pi.where = ? AND idx_target = ? ", receive_time, where, curTarget);
+						"    phonenumber, pi.where " +
+						"FROM " +
+						"    payment_index pi " +
+						"WHERE " +
+						"    receive_date = CURDATE() " +
+						"    AND receive_time = ? " +
+						"    AND pi.where = ? AND idx_target = ? ", receive_time, where, curTarget);
 			}
 			
 		}
@@ -346,17 +359,33 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 			
 			String info = 	"■ 포만감의 소식은 플친에서 확인!" + System.lineSeparator() +
 							"■ 문의 : 플친 → [채팅하기]" + System.lineSeparator() +
-							"http://pf.kakao.com/_xlxbhlj\n";  			
+							"http://pf.kakao.com/_xlxbhlj\n";  	
+			
+			List<TargetDetailBean>  detailList = null;
+			if(curTarget != null) {
+				detailList = new TargetCrudDAO().getDetailList(Integer.parseInt(curTarget));
+			}
 			
 			for(Map<String, Object> map : lom) {
-				String w = (where==null?(map.get("where")+""):where);
-				if(w.contains("(")) {
-					w = w.substring(0, w.indexOf("("));
+				//String w = (where==null?(map.get("where")+""):where);
+				//if(w.contains("(")) {
+				//	w = w.substring(0, w.indexOf("("));
+				//}
+				
+				int wIdx = Integer.parseInt(where==null?(map.get("where")+""):where);
+				String detailName = "";
+				if(detailList != null) {
+					for(TargetDetailBean bean : detailList) {
+						if(bean.getIdx().intValue() == wIdx) {
+							detailName = bean.getName();
+							break;
+						}
+					}
 				}
 				
 				String text = 	"[포만감 도착 안내]" + System.lineSeparator() +
 		    			"주문하신 음식이 '곧 도착' 합니다." + System.lineSeparator() +
-		    			"수령 장소 : " + w + System.lineSeparator() + System.lineSeparator();
+		    			"수령 장소 : " + detailName + System.lineSeparator() + System.lineSeparator();
 				
 				String phonenumber = map.get("phonenumber") + "";
 				

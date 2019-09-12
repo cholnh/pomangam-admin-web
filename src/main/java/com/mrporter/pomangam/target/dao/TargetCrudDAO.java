@@ -40,6 +40,18 @@ public class TargetCrudDAO extends Crud<TargetBean> {
 			return Integer.parseInt(lom.get(0).get("sum(cnt_order)")+"");
 	}
 	
+	public List<TargetBean> getCompactBeanList() throws Exception {
+		List<TargetBean> targetList = null;
+		List<Map<String, Object>> lom = sqlQuery(
+				"SELECT * FROM target");
+		if(!lom.isEmpty()) {
+			Gson gson = new Gson();
+			targetList = new Gson().fromJson(gson.toJson(lom), 
+					new TypeToken<List<TargetBean>>() {}.getType());
+		}
+		return targetList;
+	}
+	
 	public List<TargetDetailBean> getAllDetailList() throws Exception {
 		List<TargetDetailBean> detailList = null;
 		List<Map<String, Object>> lom = sqlQuery(

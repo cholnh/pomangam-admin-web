@@ -17,6 +17,6 @@ public class TargetDetailBean {
 	Integer idx, idx_target;
 	String name;
 	Time increasing_time;
-	String target_name;
+	String target_name, abbr_name;
 }
 		

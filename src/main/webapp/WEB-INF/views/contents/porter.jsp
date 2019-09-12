@@ -1,3 +1,5 @@
+<%@page import="com.mrporter.pomangam.target.vo.TargetDetailBean"%>
+<%@page import="com.mrporter.pomangam.order.vo.OrderTimeBean"%>
 <%@page import="com.mrporter.pomangam.restaurant.vo.RestaurantBean"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
@@ -15,6 +17,10 @@
 	List<Integer> orderedRestaurantList = (List<Integer>) request.getAttribute("orderedRestaurantList");
 	@SuppressWarnings({"unchecked"})
 	List<RestaurantBean> restaurantBeanList = (List<RestaurantBean>) request.getAttribute("restaurantBeanList");
+	@SuppressWarnings({"unchecked"})
+	List<TargetDetailBean> detailList = (List<TargetDetailBean>) request.getAttribute("detailList");
+	@SuppressWarnings({"unchecked"})
+	List<OrderTimeBean> orderTimeList = (List<OrderTimeBean>) request.getAttribute("orderTimeList");
 	
 %>
 <div class="px-content" style="padding:5px">
@@ -49,7 +55,15 @@
 					<option value="-1">전체</option>
 				</select>
 				<select id="query_loc">
-					<%if(curTarget.equals("0")) { %>
+					<option value="-1">전체</option>
+					<%
+					if(detailList != null) {
+						for(TargetDetailBean bean: detailList) {%>
+						<option value="<%=bean.getIdx()%>">[<%=bean.getTarget_name()%>] <%=bean.getName() %></option>
+					<%}} %>
+					
+					<!-- 
+					<%//if(curTarget.equals("0")) { %>
 						<option value="-1">전체</option>
 						<option value="1">학생회관 뒤</option>
 						<option value="2">기숙사 식당</option>
@@ -59,22 +73,22 @@
 						<option value="6">연암관</option>
 						<option value="7">다산관/반계관</option>
 						<option value="8">오륜관/난설허관</option>
-					<%} else if(curTarget.equals("1")) {%>
+					<%//} else if(curTarget.equals("1")) {%>
 						<option value="-1">전체</option>
 						<option value="1">학생회관 뒤</option>
 						<option value="2">기숙사 식당</option>
-					<%} else if(curTarget.equals("2")) {%>
+					<%//} else if(curTarget.equals("2")) {%>
 						<option value="-1">전체</option>
 						<option value="1">기숙사 정문</option>
 						<option value="2">제2학생회관</option>
 						<option value="3">아카데미홀</option>
-					<%} else if(curTarget.equals("3")) {%>
+					<%//} else if(curTarget.equals("3")) {%>
 						<option value="-1">전체</option>
 						<option value="1">연암관</option>
 						<option value="2">다산관/반계관</option>
 						<option value="3">오륜관/난설허관</option>
-					<%} %>
-					
+					<%//} %>
+					 -->
 					
 				</select>
 			</div>
@@ -141,7 +155,7 @@
 					<!-- <th data-field="idxes_payment" data-sortable="true">개별번호</th> -->
 					<th data-field="receive_date" data-sortable="true">받는날짜</th>
 					<th data-field="receive_time" data-sortable="true">받는시간</th>
-					<th data-field="where" data-sortable="true">음식받는곳</th>
+					<th data-field="where" data-sortable="true" data-formatter="whereFormatter">음식받는곳</th>
 					<th data-field="member_name" data-sortable="true">이름</th>
 					<th data-field="phonenumber" data-sortable="true">핸드폰번호</th>
 					<th data-field="guestname" data-sortable="true">비회원이름</th>
@@ -401,31 +415,52 @@ var targetList = ${targetList};
 var restaurantList = ${restaurantList};
 var productList = ${productList};
 var curTarget = ${curTarget==null?"0":curTarget};
+var detailList = <%=new Gson().toJson(detailList)%>;
+var orderTimeList = <%=new Gson().toJson(orderTimeList)%>;
 
 //var additionalList = ${additionalList};
 $('#test').hide();
 $('#copyarea').hide();
 
-var paramtime = <%=paramtime%>;
-var time_list = [12,13,14,17,18,19,21,22];
-time_list.forEach(function(e){
+console.log(orderTimeList);
+
+var paramtime = '<%=paramtime%>';
+//var time_list = [12,13,14,17,18,19,21,22];
+
+function twoDigits(input) {
+	if(input.toString().length < 2) {
+		return '0' + input;
+	}
+	return input;
+}
+
+orderTimeList.forEach(function(e){
+	var text = e.arrivalTime.split(" ")[0].split(":");
+	var arrivalTime = new Date();
+	arrivalTime.setHours(text[0]);
+	arrivalTime.setMinutes(text[1]);
+	arrivalTime.setSeconds(text[2]);
+	arrivalTime.setMilliseconds(0);
+	
+	var t = e.arrivalTime.split(" ")[1] + ' ' + arrivalTime.getHours()+'시 '+(arrivalTime.getMinutes()>0?arrivalTime.getMinutes()+'분':'');
+	var value = twoDigits(((e.arrivalTime.split(" ")[1] == '오후' ? 12 : 0) + arrivalTime.getHours())) + ':' + twoDigits(arrivalTime.getMinutes()) + ':00';
 	var tf = false;
-	if(paramtime != null && (paramtime == e)) {
+	if(paramtime != null && (paramtime == value)) {
 		tf = true;
 	}
 	$('#query_time').append($('<option>', {
-	    text: e+'시',
-	    value: e,
+	    text: t,
+	    value: value,
 	    selected: tf
 	}));
 	$('#arrivesel').append($('<option>', {
-	    text: e+'시',
-	    value: e+'시',
+	    text: t,
+	    value: value,
 	    selected: tf
 	}));
 	$('#arrivesel2').append($('<option>', {
-	    text: e+'시',
-	    value: e+'시',
+	    text: t,
+	    value: value,
 	    selected: tf
 	}));
 });
@@ -441,6 +476,19 @@ $('#query_time').change(function() {
 
 $('#query_loc').change(function() {
 	var loc = $(this).val();
+	$('#table').bootstrapTable('filterBy');
+	for(var i=0; i<detailList.length; i++) {
+		var detail = detailList[i];
+		if(detail.idx == loc) {
+			console.log("search... : " + detail.idx );
+			$('#table').bootstrapTable('filterBy', {
+			    where : [detail.idx+'']
+			});
+			break;
+		}
+	}
+	
+	/*
 	$('#table').bootstrapTable('filterBy');
 	
 	if(curTarget == 0) {
@@ -519,6 +567,7 @@ $('#query_loc').change(function() {
 			});
 		}
 	}
+	*/
 });
 
 $('#query_restaurant').change(function() {
@@ -546,6 +595,14 @@ productMap = productList.reduce(function(map, obj) {
 	map[obj.idx] = obj.name;
 	return map;
 }, {});
+var detailMap;
+detailMap = detailList.reduce(function(map, obj) {
+	map[obj.idx] = obj.name;
+	return map;
+}, {});
+
+
+
 /*
 var additionalMap;
 additionalMap = additionalList.reduce(function(map, obj) {
@@ -561,6 +618,11 @@ function boxStyle(value, row, index, field) {
 
 function statusFormatter(value, row) {
 	return statusMap(value);
+}
+
+function whereFormatter(value, row) {
+	console.log(value);
+	return detailMap[value];
 }
 
 function orderFormatter(value, row) {

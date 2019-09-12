@@ -9,7 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import com.mrporter.pomangam.common.pattern.dao.Crud;
 import com.mrporter.pomangam.common.util.BizmApi;
 import com.mrporter.pomangam.common.util.Date;
-import com.mrporter.pomangam.order.vo.ApiResultBean;
+import com.mrporter.pomangam.order.vo.OrderTimeBean;
 import com.mrporter.pomangam.order.vo.PaymentBean;
 
 /**
@@ -43,6 +43,30 @@ public class PaymentCrudDAO extends Crud<PaymentBean> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public List<OrderTimeBean> getAllOrderTimeList() throws Exception {
+		List<OrderTimeBean> orderList = null;
+		List<Map<String, Object>> lom = sqlQuery(
+				"SELECT DISTINCT arrivalTime, pickUpTime, orderEndTime FROM order_time ot ORDER BY arrivalTime");
+		if(!lom.isEmpty()) {
+			Gson gson = new Gson();
+			orderList = new Gson().fromJson(gson.toJson(lom), 
+					new TypeToken<List<OrderTimeBean>>() {}.getType());
+		}
+		return orderList;
+	}
+	
+	public List<OrderTimeBean> getAllOrderTimeList(Integer idx_target) throws Exception {
+		List<OrderTimeBean> orderList = null;
+		List<Map<String, Object>> lom = sqlQuery(
+				"SELECT DISTINCT arrivalTime, pickUpTime, orderEndTime FROM order_time ot WHERE idx_target = ? AND state_active = 1 ORDER BY arrivalTime", idx_target);
+		if(!lom.isEmpty()) {
+			Gson gson = new Gson();
+			orderList = new Gson().fromJson(gson.toJson(lom), 
+					new TypeToken<List<OrderTimeBean>>() {}.getType());
+		}
+		return orderList;
 	}
 	
 	public void sendOrderMsg(int paymentIndex) throws Exception {

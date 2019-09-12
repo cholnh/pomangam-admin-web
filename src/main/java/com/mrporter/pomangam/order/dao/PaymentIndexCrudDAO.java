@@ -69,10 +69,10 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		List<Map<String, Object>> lom;
 		if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
 			lom = sqlQuery(
-					"SELECT idxes_payment FROM payment_index WHERE receive_date = ? AND receive_time = ?", Date.getCurDay(), time+"시");
+					"SELECT idxes_payment FROM payment_index WHERE receive_date = ? AND receive_time = ?", Date.getCurDay(), time);
 		} else {
 			lom = sqlQuery(
-					"SELECT idxes_payment FROM payment_index WHERE receive_date = ? AND receive_time = ? AND idx_target = ? ", Date.getCurDay(), time+"시", curTarget);
+					"SELECT idxes_payment FROM payment_index WHERE receive_date = ? AND receive_time = ? AND idx_target = ? ", Date.getCurDay(), time, curTarget);
 		}
 		
 		
@@ -285,11 +285,11 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
 			lom 
 			= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND receive_time = ? order by receive_time desc, idx_box desc;",
-					Date.getCurDay(), time+"시");
+					Date.getCurDay(), time);
 		} else {
 			lom 
 			= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND receive_time = ? AND idx_target = ? order by receive_time desc, idx_box desc;",
-					Date.getCurDay(), time+"시", curTarget);
+					Date.getCurDay(), time, curTarget);
 		}
 
 		if(lom!=null && !lom.isEmpty()) {
@@ -322,11 +322,11 @@ public class PaymentIndexCrudDAO extends Crud<PaymentIndexBean> {
 		if(curTarget == null || curTarget.isEmpty() || curTarget.equals("0")) {
 			lom 
 			= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND receive_time = ? order by receive_time desc, idx_box desc;",
-					Date.getCurDay(), time+"시");
+					Date.getCurDay(), time);
 		} else {
 			lom 
 			= sqlQuery("SELECT * FROM payment_index WHERE receive_date = ? AND receive_time = ? AND idx_target = ? order by receive_time desc, idx_box desc;",
-					Date.getCurDay(), time+"시", curTarget);
+					Date.getCurDay(), time, curTarget);
 		}
 		
 		Gson gson = new Gson();

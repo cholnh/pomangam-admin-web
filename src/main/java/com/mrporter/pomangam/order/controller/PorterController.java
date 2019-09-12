@@ -64,6 +64,16 @@ public class PorterController {
 		model.addObject("restaurantList", new RestaurantCrudDAO().getCompactList());
 		model.addObject("restaurantBeanList", new RestaurantCrudDAO().getBeanList());
 		model.addObject("productList", new ProductCrudDAO().getCompactList());
+		
+		if(curTarget == null || curTarget.trim().equals("") || curTarget.equals("0")) {
+			model.addObject("detailList", new TargetCrudDAO().getAllDetailList());
+			model.addObject("orderTimeList", new PaymentCrudDAO().getAllOrderTimeList());
+		} else {
+			int idxTarget = Integer.parseInt(curTarget);
+			model.addObject("detailList", new TargetCrudDAO().getDetailList(idxTarget));
+			model.addObject("orderTimeList", new PaymentCrudDAO().getAllOrderTimeList(idxTarget));
+		}
+		
 		//model.addObject("additionalList", new ProductCrudDAO().getAdditionalCompactList());
 		
 		if(time != null && time.length() > 0) {

@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.mrporter.pomangam.common.pattern.dao.Crud;
 import com.mrporter.pomangam.target.vo.TargetBean;
+import com.mrporter.pomangam.target.vo.TargetDetailBean;
 
 /**
  * LiveCrudDAO
@@ -36,6 +38,30 @@ public class TargetCrudDAO extends Crud<TargetBean> {
 			return 0;
 		else
 			return Integer.parseInt(lom.get(0).get("sum(cnt_order)")+"");
+	}
+	
+	public List<TargetDetailBean> getAllDetailList() throws Exception {
+		List<TargetDetailBean> detailList = null;
+		List<Map<String, Object>> lom = sqlQuery(
+				"SELECT d.*, t.name as target_name FROM target_delivery_detail d, target t WHERE d.idx_target = t.idx");
+		if(!lom.isEmpty()) {
+			Gson gson = new Gson();
+			detailList = new Gson().fromJson(gson.toJson(lom), 
+					new TypeToken<List<TargetDetailBean>>() {}.getType());
+		}
+		return detailList;
+	}
+	
+	public List<TargetDetailBean> getDetailList(Integer idx_target) throws Exception {
+		List<TargetDetailBean> detailList = null;
+		List<Map<String, Object>> lom = sqlQuery(
+				"SELECT d.*, t.name as target_name FROM target_delivery_detail d, target t WHERE d.idx_target = t.idx AND idx_target = ?", idx_target);
+		if(!lom.isEmpty()) {
+			Gson gson = new Gson();
+			detailList = new Gson().fromJson(gson.toJson(lom), 
+					new TypeToken<List<TargetDetailBean>>() {}.getType());
+		}
+		return detailList;
 	}
 	
 	public void addCountOrder(Integer idx) throws Exception {

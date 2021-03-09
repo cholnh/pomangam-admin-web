@@ -17,10 +17,10 @@ public class Config {
 	// DB 정보
 	private final String tool = "jdbc:mysql://";
 	private final String domain = "localhost";
-	private final String id = "nakzzi";
+	private final String id = "";
 	private final String port = "3306";
-	private final String pw = "skrwl486";
-	private final String dbname = "db_pomangam";
+	private final String pw = "";
+	private final String dbname = "";
 
 	
 	private String url = tool + domain + ":" + port + "/" + dbname
